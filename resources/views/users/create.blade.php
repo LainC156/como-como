@@ -12,7 +12,9 @@
                                 <h3 class="mb-0 text-red">{{ __('Campos obligatorios') }} *</h3>
                             </div>
                             <div class="col-4 text-right">
-                                <a href="{{ route('user.index') }}" class="btn btn-sm btn-primary">{{ __('Pacientes registrados') }}</a>
+                                <a href="{{ route('user.index') }}" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-users" aria-hidden="true"></i>
+                                {{ __('Pacientes registrados') }}</a>
                             </div>
                         </div>
                     </div>
@@ -224,7 +226,9 @@
 
                                 @include('helpers.alerts')
                                 <div class="text-center">
-                                    <button id="create_user_btn" type="submit" class="btn btn-success mt-4">{{ __('Crear usuario') }}</button>
+                                    <button id="create_user_btn" type="submit" class="btn btn-success mt-4">
+                                        <i class="fa fa-user-plus" aria-hidden="true"></i>
+                                    {{ __('Crear usuario') }}</button>
                                 </div>
                             </div>
                     </div>

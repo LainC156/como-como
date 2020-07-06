@@ -24,7 +24,7 @@ class CreateMenusTable extends Migration
             $table->string('description')->nullable();
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('kind_of_menu')->deafult('0');
+            $table->integer('kind_of_menu')->default(0);
             $table->boolean('status')->default('1');
             $table->timestamps();
             $table->softDeletes();

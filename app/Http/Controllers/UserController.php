@@ -213,13 +213,12 @@ class UserController extends Controller
                 return response()->json(['status' => 'success', 'message' => __('Datos actualizados correctamente')]);
             }catch(\Illuminate\Database\QueryException $ex){
                 DB::rollback();
-                $message = __('Ocurrió un error, vuelve a intentarlo1');
+                $message = __('Ocurrió un error, vuelve a intentarlo');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
             }
             catch(\Exception $ex){
                 DB::rollback();
-                $message = __('Ocurrió un error, vuelve a intentarlo2');
-                dd($ex);
+                $message = __('Ocurrió un error, vuelve a intentarlo');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
             }
         }

@@ -42,14 +42,20 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'ProfileController@password']);
         /* menus routes */
     Route::get('/menu/{id}/create', 'MenuController@create')->name('menu.create');
-    Route::get('/user/{id}/menus', 'MenuController@index')->name('index.menu');
-    Route::get('/menu/{id}/list', 'MenuController@list')->name('list.menu');
-    Route::get('/user/{id}/menu/{menu_id}/edit', 'MenuController@editMenuSaved')->name('edit.menu');
-    Route::get('user/{id}/menu/{menu_id}/results', 'MenuController@results')->name('results.menu');
-
-    Route::post('/addfood', 'FoodController@addFood')->name('add.food');
-    Route::get('listfood', 'FoodController@foodList')->name('list.food');
-    Route::post('/editcomponent', 'FoodController@update')->name('update.food');
+    Route::post('menu/store', 'MenuController@store')->name('menu.store');
+    Route::post('/updatemenu', 'MenuController@update')->name('menu.update');
+    Route::post('deletemenu','MenuController@delete')->name('menu.delete');
+    Route::get('/user/{id}/menus', 'MenuController@index')->name('menu.index');
+    Route::get('/menu/{id}/list', 'MenuController@list')->name('menu.list');
+    Route::get('/user/{id}/menu/{menu_id}/edit', 'MenuController@editMenuSaved')->name('menu.edit');
+    Route::post('emptymenu', 'MenuController@empty')->name('empty.menu');
+    Route::get('user/{id}/menu/{menu_id}/results', 'MenuController@results')->name('menu.results');
+        /* foods routes */
+    Route::post('/addfood', 'FoodController@addFood')->name('food.add');
+    Route::get('listfood', 'FoodController@foodList')->name('food.list');
+        /* components routes */
+    Route::post('/updatecomponent', 'FoodController@update')->name('component.update');
+    Route::post('/deletecomponent', 'FoodController@destroy')->name('component.destroy');
 
 });
 

@@ -14,16 +14,20 @@
     <div class="container-fluid mt--7">
         <input type="hidden" id="patient_id" value="{!! $patient->id !!}">
         <input type="hidden" id="kind_of_menu" value="{!! $menu->kind_of_menu !!}">
-        <input type="hidden" id="add_food_route" value="{{ route('add.food') }}" >
-        <input type="hidden" id="list_food" value="{{ route('list.food') }}">
-        <input type="hidden" id="update_food" value="{{ route('update.food') }}">
-        <input type="hidden" id="list_menu" value="{{ route('list.menu', [$patient->id]) }}">
-        <input type="hidden" id="edit_saved_menu" value="{{ route('edit.menu',[$patient->id, $menu->id]) }}">
+        <input type="hidden" id="add_food_route" value="{{ route('food.add') }}" >
+        <input type="hidden" id="list_food" value="{{ route('food.list') }}">
+        <input type="hidden" id="list_menu" value="{{ route('menu.list', [$menu->id]) }}">
+        <input type="hidden" id="edit_saved_menu" value="{{ route('menu.edit',[$patient->id, $menu->id]) }}">
+        <input type="hidden" id="empty_menu_route" value="{{ route('empty.menu') }}">
+        <input type="hidden" id="update_component_route" value="{{ route('component.update') }}">
+        <input type="hidden" id="delete_component_route" value="{{ route('component.destroy') }}">
         <input type="hidden" id="time_0" value="{{ __('Desayuno') }}">
         <input type="hidden" id="time_1" value="{{ __('Colación matutina') }}">
         <input type="hidden" id="time_2" value="{{ __('Comida') }}">
         <input type="hidden" id="time_3" value="{{ __('Colación vespertina') }}">
         <input type="hidden" id="time_4" value="{{ __('Cena') }}">
+        <input type="hidden" id="store_menu_route" value="{{ route('menu.store') }}">
+        <input type="hidden" id="index_menu" value="{{ route('menu.index', [$patient->id]) }}">
         <div class="row">
             <div class="col">
                 <div class="card shadow">
@@ -33,7 +37,7 @@
                                 <div class="row">
                                     <input id="user_id" type="hidden" value="{{ $patient->id }}">
                                     <input id="menu_id" type="hidden" value="{{ $menu->id }}">
-                                    <div class="col-4">
+                                    <div class="col-auto">
                                         @if( $menu->kind_of_menu == 0 )
                                         <h5 class="mb-0 text-uppercase">{{ __('Menú nuevo') }}</h5>
                                         @else
@@ -43,26 +47,26 @@
                                             <b class="text-primary text-uppercase">{!! $menu->description !!}</b>
                                         @endif
                                         <h5 class="mb-0">{{ __('Paciente') }}:
-                                            <b class="text-primary text-uppercase">{!! $patient->name !!}</b>
+                                            <b class="text-primary text-uppercase">{!! $patient->name !!} {!! $patient->last_name !!}</b>
                                         </h5>
                                         <h5 class="mb-0">{{ __('Requerimiento calórico') }}:
                                             <b class="text-primary text-uppercase"> {!! $patient->caloric_requirement !!} {{ __('calorías') }}</b>
                                         </h5>
                                     </div>
-                                    <div class="col-8">
+                                    <div class="col">
                                         @if( $required == 1 )
-                                            <a id="btn_generate_results" class="btn btn-primary btn-outline-primary" href="{{ route('results.menu', ['id' => $patient->id, 'menu_id' => $menu->id]) }}" target="_blank" >{{ __('Generar resultados') }}</a>
+                                            <a id="btn_generate_results" class="btn btn-primary btn-outline-primary btn-sm" href="{{ route('menu.results', ['id' => $patient->id, 'menu_id' => $menu->id]) }}" target="_blank" ><i class="ni ni-chart-bar-32"></i>{{ __('Generar resultados') }}</a>
                                         @elseif( $required == 0 )
                                             <p class="description text-danger">{{ __('Este perfil no cuenta con los datos suficientes para realizar los cálculos correspondientes, da clic en ') }} {{ __('Actualizar perfil') }} {{ __('para actualizar los datos faltantes') }}. {{ __('Después de añadir los datos faltantes, vuelve aquí y actualiza la página') }}.</p>
-                                            <a class="btn btn-warning"data-toggle="tooltip" data-placement="top"
+                                            <a class="btn btn-warning btn-sm"data-toggle="tooltip" data-placement="top"
                                                 title="{{ __('Para poder generar los resultados del paciente, se requiere: edad, peso, estatura, tipo de actividad física y requerimiento calórico del mismo') }}"
-                                                href="{{ route('user.edit', [$patient->id] ) }}" >{{ __('Actualizar perfil') }}</a>
+                                                href="{{ route('user.edit', [$patient->id] ) }}" ><i class="far fa-edit" aria-hidden="true"></i>{{ __('Actualizar perfil') }}</a>
                                         @endif
                                         @if( $menu->kind_of_menu == 0 )
-                                        <a class="btn btn-success btn-outline-success" id="btn_save_m" data-toggle="modal" data-target="#saveMenuModal">{{ __('Guardar menú') }} </a>
+                                        <a class="btn btn-success btn-outline-success btn-sm" id="btn_save_m" data-toggle="modal" data-target="#saveMenuModal"><i class="ni ni-folder-17" aria-hidden="true"></i>{{ __('Guardar menú') }} </a>
                                         @endif
-                                        <a class="btn btn-warning btn-outline-warning" id="btn_delete_m"data-toggle="modal" data-target="#deleteMenuModal">{{ __('Limpiar menú') }}</a>
-                                        <a class="btn btn-info btn-outline-info" href="{{ route('index.menu',[ $patient->id ]) }}" target="_blank">{{ __('Ver menús') }}</a>
+                                        <a class="btn btn-warning btn-outline-warning btn-sm" id="btn_delete_m" data-toggle="modal" data-target="#deleteMenuModal"><i class="ni ni-fat-remove" aria-hidden="true"></i>{{ __('Limpiar menú') }}</a>
+                                        <a class="btn btn-info btn-outline-info btn-sm" href="{{ route('menu.index',[ $patient->id ]) }}" target="_blank"><i class="ni ni-archive-2"></i>{{ __('Ver menús') }}</a>
                                     </div>
                                 </div>
                                 <div class="alert alert-danger" style="display: none" role="alert" id="alert_error">
@@ -127,76 +131,18 @@
                 </div>
             </div>
         </div>
-    </div>
-        <!-- save menu modal -->
-    <div class="modal fade" id="saveMenuModal" tabindex="-1" role="dialog" aria-labelledby="saveMenuModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header alert-success">
-                    <h3 class="modal-title mb-0" id="exampleModalLabel">{{ __('Guardar menú') }}</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="col" >
-                        <div class="form-group">
-                            <label class="form-control-label" for="save_menu_name">{{ __('Nombre') }}</label>
-                            <div class="input-group input-group-alternative">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="ni ni-caps-small"></i></span>
-                                </div>
-                                <input type="text" id="menu_name" name="save_new_menu_name" class="form-control" placeholder="{{ __('Nombre') }}" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col" >
-                        <div class="form-group">
-                            <label class="form-control-label" for="save_menu_description">{{ __('Descripción') }}</label>
-                            <div class="input-group input-group-alternative">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="ni ni-caps-small"></i></span>
-                                </div>
-                                <textarea type="text" id="menu_description"name="save_new_menu_description" class="form-control" placeholder="{{ __('Descripción') }}"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col alert alert-success">
-                        <p class="text-black">{{ __('Esta ventana se cerrará al guargar el menú, para ver el menú guardado, ve a los perfiles de los usuarios y selecciona') }} {{ __('Ver menús') }}</p>
-                    </div>
-                    <div class="col">
-                        <input type="button" id="btn_save_menu" type="button" data-container="body" data-color="default" data-toggle="popover" data-placement="bottom" class="btn btn-success btn-block" value="{{ __('Guardar') }}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- delete menu modal -->
-    <div class="modal fade" id="deleteMenuModal" tabindex="-1" role="dialog" aria-labelledby="deleteMenuModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header  alert alert-warning">
-                    <h3 class="modal-title mb-0" id="exampleModalLabel">{{ __('Borrar menú') }}</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p class="alert alert-warning">{{ __('Esta acción no puede deshacerse, ¿estás seguro?') }}</p>
-                    <div class="col">
-                        <input type="button" id="btn_delete_menu" class="btn btn-warning" value="{{ __('Aceptar') }}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- edit & delete component from menu modal -->
     @include('helpers.alerts')
     @include('helpers.editFoodFromMenu')
+    @include('helpers.menus.saveMenu')
+    @include('helpers.menus.deleteMenu')
     @include('layouts.footers.auth')
+
+</div>
 @endsection
 @section("javascript")
     <script src="{{ asset('js/menus/create.js') }}"></script>
+
     <script src="{{ asset('js/alerts.js') }}"></script>
 @endsection

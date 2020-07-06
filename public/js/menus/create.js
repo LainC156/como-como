@@ -1,7 +1,7 @@
     /* search via ajax method  */
     $(document).ready(function() {
         /* global variables */
-
+        let msg = '';
         let food_id = 0;
         let menu_id = $('#menu_id').val();
         let component_id = 0;
@@ -10,9 +10,12 @@
         let url_menu_table_data = $("#kind_of_menu").val() == 0 ? url : $("#edit_saved_menu").val();
         let food_name_validation = 0;
         let food_amount = 0;
+        let food_time_id = 0;
+        let menu_name_validation = 0;
+        let menu_description_validation = 0;
         console.log('menu_id: ' + menu_id);
-        /* set up to initialize popover */
-        $('[data-toggle="popover"]').popover();
+        /* set up to initialize popover
+        $('[data-toggle="popover"]').popover(); */
         /* csrf token to ajax requests */
         $.ajaxSetup({
             headers: {
@@ -63,6 +66,8 @@
 
         /* show menu components in DataTables */
         let menu_table = $("#menu_table").DataTable({
+            "pageLength": 5,
+            "lengthMenu": [5, 10, 25, 50, 75, 100],
             processing: true,
             serverSide: true,
             ajax: {
@@ -96,7 +101,9 @@
                                 return $("#time_4").val();
                                 break;
                         }
-                    }
+                    },
+                    searchable: true,
+                    orderable: true,
                 },
                 { data: 'food_weight', name: 'food_weight' },
                 { data: 'name', name: 'name' },
@@ -130,6 +137,14 @@
             ]
         });
 
+        new $.fn.dataTable.Buttons(menu_table, {
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        });
+
+        menu_table.buttons().container()
+            .appendTo($('.col-sm-6:eq(0)', menu_table.table().container()));
         /* enable and disable buttons depending on menu_table content */
         /* if table is empty buttons are disabled, else buttons are enabled */
         /* validation to check if is possible generate results, save or delete from this menu */
@@ -162,7 +177,7 @@
             food_name_validation = 1;
             $("#food_amount").focus();
             /* check if food amount field value is correct, then activate add food button */
-            if ($("#food_amount").val() && $("#food_amount").val() > 0) {
+            if ($("#food_amount").val() && $("#food_amount").val() > 0 && $("#food_name").val()) {
                 $("#add_food").attr('disabled', false);
             } else {
                 $("#add_food").attr('disabled', true);
@@ -173,15 +188,6 @@
                 food_table.$('tr.selected').removeClass('selected');
                 $(this).addClass('selected');
             }
-            /* enable or disable add_food button to avoid unncesary request
-            if( $("#food_name").is(':disabled') ) {
-                console.log('elemento seleccionado');
-                $("#add_food").prop('disabled', false);
-            } else if( $("#food_name").is(':enabled') ) {
-                console.log('elemento no seleccionado');
-                $("#add_food").prop('disabled', true);
-            } */
-
         });
         /* check if food name field and food amount field is no empty and the enable add food button */
         $("#food_amount").keyup(function() {
@@ -202,57 +208,14 @@
             $("#menuComponentFoodWeightEdited").val(row_data.food_weight);
             $("#menuComponentKindOfFoodEdited").val(row_data.kind_of_food);
             $("#editMenuComponentModal").modal('show');
-
-            //menu_table.row(this).edit();
-
         });
-        /* validations to show popover */
-        $("#add_food").on('show.bs.popover', function() {
-            console.log('popover clic');
-            //$(this).popover('show');
-            setTimeout(function() {
-                console.log('vamos a esconder');
-                $("#add_food").popover('hide');
-                $("#add_food").attr('data-content', '');
-            }, 2000);
-        }); //$(this).popover('show');
         /* adding food when button with id="add_food" is clicked */
         $("#add_food").click(function(e) {
-            /* validations */
-            let msg = '';
-            console.log('mensaje al inicio: ' + msg);
-            if ($("#food_name").val() == '') {
-                msg = "{{ __('Es necesario seleccionar un alimento') }}" + ", ";
-            }
-            if ($("#food_amount").val() == '') {
-                msg += "{{ __('Es necesario especificar un peso') }}" + ", ";
-                $(this).focus();
-                console.log('vacio');
-            }
-            if ($("#food_amount").val() <= 0) {
-                msg += "{{ __('El peso debe ser mayor que 0') }}" + ", ";
-                $(this).focus();
-                console.log('<= 0' + $("#food_amount").val());
-            }
-            if ($("#food_time :selected").val() == -1) {
-                msg += "{{ __('Es necesario seleccionar un tiempo') }}";
-                console.log('default');
-            }
-            if (msg.length > 0) {
-                console.log('mensaje desde validacion: ' + msg);
-                console.log('nombre desde validacion: ' + $("#food_name").val());
-                $("#add_food").attr('data-content', msg);
-                $("#add_food").attr('data-color', 'danger');
-                $(this).removeClass('btn-default').addClass('btn-danger');
-                $(".popover-body").css("background-color", "tomato");
-                $(this).popover('show');
-                return;
-            }
             /* add food to menu */
-            let food_amount = $("#food_amount").val();
+            food_amount = $("#food_amount").val();
             console.log('food_id: ' + food_id);
             console.log('menu_id: ' + menu_id);
-            var food_time_id = $("#food_time :selected").val();
+            food_time_id = $("#food_time :selected").val();
             console.log('food time id: ' + food_time_id);
             let data = {
                 food_id: food_id,
@@ -268,33 +231,21 @@
                 //processData: false,
                 url: $("#add_food_route").val(),
                 success: function(data) {
-                    let msg = data.message;
+                    msg = data.message;
                     console.log('mensaje: ' + msg);
-                    $("#alert_success").empty();
-                    $('#alert_success').append('<span class="text-dark"><i class="ni ni-check-bold"></i></span>' + msg);
-
-                    $("#alert_success").show();
-                    setTimeout(function() {
-                        $("#alert_success").hide();
-                    }, 5000);
+                    showSuccessMessage(msg);
                     /* reset fields */
                     $("#food_name").val('');
-                    //$("#food_name").prop('disabled', false);
                     $("#food_amount").val('');
-                    $("#add_food").removeClass('btn-danger').addClass('btn-default');
+                    $('input[type=search]').val('').change();
                     menu_table.ajax.reload();
                     check_menu_table_size();
                     console.log('valor de food_id: ' + food_id);
                 },
                 error: function(data) {
-                    let msg = data.message;
+                    msg = data.message;
                     console.log('error: ' + msg);
-                    $("#alert_error").empty();
-                    $('#alert_error').append('<span class="text-dark"><i class="ni ni-fat-remove"></i></span>' + msg);
-                    $("#alert_error").show();
-                    setTimeout(function() {
-                        $("#alert_error").hide();
-                    }, 5000);
+                    showErrorMessage(msg);
                 }
             })
 
@@ -302,110 +253,111 @@
         /*  reset fields from trash button */
         $('#remove_data').click(function() {
             $("#food_name").val('');
-            //$("#food_name").prop('disabled', false);
+            $("#add_food").prop('disabled', true);
             $("#food_amount").val('');
+            food_name_validation = 0;
+        });
+        /* check if food_amount in edit component is no empty */
+        $("#menuComponentFoodWeightEdited").keyup(function() {
+            let amount = $("#menuComponentFoodWeightEdited").val();
+            if (!amount || amount <= 0) {
+                $("#update_component_btn").attr('disabled', true);
+            } else {
+                $("#update_component_btn").attr('disabled', false);
+            }
         });
         /* update component */
-        $("#btn_update_component").on('click', function() {
-            let msg = '';
-            let id_food_time = $("#menuComponentKindOfFoodEdited :selected").val() != 'Tiempo' ? $("#menuComponentKindOfFoodEdited :selected").val() : -1;
-            let food_weight = $("#menuComponentFoodWeightEdited").val();
+        $("#update_component_btn").on('click', function() {
+            let food_amount = $("#menuComponentFoodWeightEdited").val();
+            let food_time_id = $("#menuComponentKindOfFoodEdited :selected").val();
             console.log('component_id: ' + component_id);
-            /* validations */
-            if (id_food_time == -1) {
-                msg = "{{ __('Es necesario seleccionar un tiempo') }}" + ", ";
-            }
-            if (food_weight == '') {
-                msg += "{{ __('Es necesario especificar un peso') }}" + ", ";
-            }
-            if (food_weight <= 0) {
-                msg += "{{ __('El peso debe ser mayor que 0') }}";
-            }
-            if (msg.length > 0) {
-                console.log('mensaje: ' + msg);
-                $("#btn_update_component").attr('data-content', msg);
-                $(this).popover('show');
-                return;
-            }
+            console.log('food_amount: ', food_amount);
+            console.log('food_time_id: ', food_time_id);
             $.ajax({
-                    data: { component_id, id_food_time, food_weight },
-                    dataType: 'json',
-                    type: 'POST',
-                    url: "{{ route('edit.component') }}",
-                    success: function(data) {
-                        console.log('exito' + data.message);
-                        var msg = data.message;
-                        $("#editMenuComponentModal").modal('hide');
-                        $("#alert_success").empty();
-                        $('#alert_success').append("<strong>{{ __('Listo') }}: </strong>" + msg);
-                        $("#alert_success").show();
-                        setTimeout(function() {
-                            $("#alert_success").hide();
-                        }, 3000);
-                        menu_table.ajax.reload();
-                    },
-                    error: function(data) {
-                        let msg = data.message;
-                        console.log('error: ' + msg);
-                        $("#alert_error").empty();
-                        $('#alert_error').append("<strong>{{ __('Error') }}: </strong>" + msg);
-                        $("#alert_error").show();
-                        setTimeout(function() {
-                            $("#alert_error").hide();
-                        }, 3000);
-                    }
-                })
-                //e.preventDefault();
-
+                data: { component_id, food_time_id, food_amount },
+                dataType: 'json',
+                type: 'POST',
+                url: $("#update_component_route").val(),
+                success: function(data) {
+                    console.log('exito' + data.message);
+                    msg = data.message;
+                    $("#editMenuComponentModal").modal('hide');
+                    showSuccessMessage(msg);
+                    menu_table.ajax.reload();
+                },
+                error: function(data) {
+                    msg = data.message;
+                    console.log('error: ' + msg);
+                    showErrorMessage(msg);
+                }
+            })
         });
         /* delete component */
-        $("#btn_delete_component").on('click', function() {
+        $("#delete_component_btn").on('click', function() {
             console.log('component_id: ' + component_id);
             $.ajax({
                 data: { component_id },
                 dataType: 'json',
                 type: 'POST',
-                url: "{{ route('delete.component') }}",
+                url: $("#delete_component_route").val(),
                 success: function(data) {
-                    let msg = data.message;
+                    msg = data.message;
                     $("#editMenuComponentModal").modal('hide');
-                    $("#alert_success").empty();
-                    $('#alert_success').append("<strong>{{ __('Listo') }}: </strong>" + msg);
-                    $("#alert_success").show();
-                    setTimeout(function() {
-                        $("#alert_success").hide();
-                    }, 3000);
-                    $("editMenuComponentModal").modal('hide');
-                    menu_table.ajax.reload();
-                    check_menu_table_size();
+                    if (data.status == 'success') {
+                        showSuccessMessage(msg);
+                        menu_table.ajax.reload();
+                        check_menu_table_size();
+                    } else {
+                        showErrorMessage(msg);
+                    }
                 },
                 error: function(data) {
-                    let msg = data.message;
+                    msg = data.message;
                     console.log('error: ' + msg);
-                    $("#alert_error").empty();
-                    $('#alert_error').append("<strong>{{ __('Error') }}: </strong>" + msg);
-                    $("#alert_error").show();
-                    setTimeout(function() {
-                        $("#alert_error").hide();
-                    }, 3000);
+                    showErrorMessage(msg);
                 }
             })
         });
+        /* validations to save menu */
+        $("#menu_name").keyup(function() {
+            let name = $("#menu_name").val();
+            if (!name) {
+                $("#name_required").show();
+                $("#name_check").hide();
+                menu_name_validation = 0;
+                $("#save_menu_btn").attr('disabled', true);
+            } else {
+                $("#name_required").hide();
+                $("#name_check").show();
+                menu_name_validation = 1;
+                if (menu_description_validation == 1) {
+                    $("#save_menu_btn").attr('disabled', false);
+                }
+            }
+        });
+        $("#menu_description").keyup(function() {
+            let description = $("#menu_description").val();
+            if (!description) {
+                $("#description_required").show();
+                $("#description_check").hide();
+                menu_description_validation = 0;
+                $("#save_menu_btn").attr('disabled', true);
+            } else {
+                $("#description_required").hide();
+                $("#description_check").show();
+                menu_description_validation = 1;
+                if (menu_name_validation == 1) {
+                    $("#save_menu_btn").attr('disabled', false);
+                }
+            }
+        });
         /* save menu, show modal and save data */
-        $("#btn_save_menu").click(function() {
+        $("#save_menu_btn").click(function() {
             /* validations */
             let name = $("#menu_name").val();
             let description = $("#menu_description").val();
-            let msg = '';
-            if (name == '')
-                msg = "{{ __('El campo nombre es requerido') }}" + ", ";
-            if (description == '')
-                msg += "{{ __('El campo descripcion es requerido') }}" + ".";
-            if (msg.length > 0) {
-                console.log('msg: ' + msg);
-                $(this).empty();
-                $(this).attr('data-content', msg);
-                $(this).popover('show');
+            if (!name || !description) {
+                console.log('algun campo vacío');
                 return;
             }
             var data = {
@@ -420,32 +372,21 @@
                 data: data,
                 dataType: 'json',
                 type: 'POST',
-                url: "{{ route('save.menu') }}",
+                url: $("#store_menu_route").val(),
                 success: function(data) {
-                    let msg = data.message;
-                    $("#alert_success").empty();
-                    $('#alert_success').append("<strong>{{ __('Listo') }}: </strong>" + msg);
-                    $("#alert_success").show();
-                    setTimeout(function() {
-                        $("#alert_success").hide();
-                        window.close();
-                    }, 3000);
-                    //$("#menu_name").val('');
-                    //$("#menu_description").val('');
+                    msg = data.message;
                     $("#saveMenuModal").modal('hide');
-                    //check_menu_table_size();
-
-                    //menu_table.ajax.reload();
+                    if (data.status == 'success') {
+                        showSuccessMessage(msg);
+                        window.location.replace($("#index_menu").val())
+                    } else {
+                        showErrorMessage(msg);
+                    }
                 },
                 error: function(data) {
-                    let msg = data.message;
-                    console.log('error: ' + msg);
-                    $("#alert_error").empty();
-                    $('#alert_error').append("<strong>{{ __('Error') }}: </strong>" + msg);
-                    $("#alert_error").show();
-                    setTimeout(function() {
-                        $("#alert_error").hide();
-                    }, 3000);
+                    msg = data.message;
+                    $("#saveMenuModal").modal('hide');
+                    showErrorMessage(msg);
                 }
 
             });
@@ -458,27 +399,22 @@
                 data: { menu_id },
                 dataType: 'json',
                 type: 'POST',
-                url: "{{ route('empty.menu') }}",
+                url: $("#empty_menu_route").val(),
                 success: function(data) {
-                    let msg = data.message;
-                    $("#alert_success").empty();
-                    $('#alert_success').append("<strong>{{ __('Listo') }} </strong>" + msg);
-                    $("#alert_success").show();
-                    setTimeout(function() {
-                        $("#alert_success").hide();
-                    }, 3000);
+                    msg = data.message;
                     $("#deleteMenuModal").modal('hide');
+                    if (data.status == 'success') {
+                        showSuccessMessage(msg);
+                        check_menu_table_size();
+                    } else {
+                        showErrorMessage(msg);
+                    }
                     menu_table.ajax.reload();
                 },
                 error: function(data) {
-                    let msg = data.message;
-                    console.log('error: ' + msg);
-                    $("#alert_error").empty();
-                    $('#alert_error').append("<strong>{{ __('Error') }}: </strong>" + msg);
-                    $("#alert_error").show();
-                    setTimeout(function() {
-                        $("#alert_error").hide();
-                    }, 3000);
+                    msg = data.message;
+                    $("#deleteMenuModal").modal('hide');
+                    showErrorMessage(msg);
                 }
             })
         });

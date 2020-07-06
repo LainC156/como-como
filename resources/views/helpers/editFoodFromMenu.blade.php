@@ -54,7 +54,7 @@
                                         <label class="form-control-label" for="edit_component_kindoffood">{{ __('Tiempo') }}</label>
                                         <div class="input-group input-group-alternative">
                                             <div class="input-group-prepend  btn btn-sm btn-block">
-                                                <select id="menuComponentKindOfFoodEdited" class="form-control alert-primary" name="edit_component_kindoffood"
+                                                <select id="menuComponentKindOfFoodEdited" class="form-control" name="edit_component_kindoffood"
                                                 data-toggle="tooltip" data-placement="top"
                                                 title="{{ __('Selecciona en que momento del día fue consumido el alimento') }}">
                                                     <option value="-1" disabled>{{ __('Tipo de comida') }}</option>
@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                 <div class="col text-center">
-                                    <button id="btn_update_component" type="button" data-container="body" data-color="default" data-toggle="popover" data-placement="top" class="btn btn-default">{{ __('Actualizar') }}</button>
+                                    <button id="update_component_btn" type="button" data-container="body" data-color="default" data-toggle="popover" data-placement="top" class="btn btn-default"><i class="ni ni-fat-add"></i>{{ __('Actualizar componente') }}</button>
                                 </div>
                             </div>
 
@@ -78,8 +78,8 @@
                                 <div class="alert alert-warning" role="alert">
                                         <strong>{{ __('Advertencia') }}: </strong>{{ __('Esta acción no puede deshacerse') }}
                                 </div>
-                                <div class="col text-center">
-                                        <button id="btn_delete_component" class="btn btn-warning">{{ __('Eliminar') }}</button>
+                                <div class="col text-center ">
+                                    <button id="delete_component_btn" class="btn btn-warning"><i class="ni ni-fat-remove" aria-hidden="true"></i>{{ __('Eliminar componente') }}</button>
                                 </div>
                             </div>
                                 </div>

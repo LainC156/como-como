@@ -28,7 +28,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <button id="add_food" type="button" class="btn btn-default" data-container="body" data-color="default" data-toggle="popover" data-placement="bottom" disabled>{{ __('Agregar al menú') }}</button>
+                                        <button id="add_food" type="button" class="btn btn-default" data-container="body" data-color="default" data-toggle="popover" data-placement="bottom" disabled><i class="ni ni-fat-add"></i>{{ __('Agregar al menú') }}</button>
                                     </div>
                                                     <!-- food data table -->
                             <div class="table-responsive">

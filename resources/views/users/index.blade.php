@@ -41,9 +41,9 @@
                                             <form action="{{ route('user.destroy', $user->id) }}" method="post">
                                                 @csrf
                                             <a class="btn btn-primary btn-sm" href="{{ route('menu.create', [$user->id]) }}" target="_blank">
-                                                <i class="fas fa-bars"> {{ __('Crear menú') }} </i>
+                                                <i class="ni ni-fat-add"></i>{{ __('Crear menú') }}
                                             </a>
-                                            <a class="btn btn-info btn-sm" href="" target="_blank"><i class="fas fa-bars"> {{ __('Ver menus') }} </i></a>
+                                            <a class="btn btn-info btn-sm" href="{{ route('menu.index', [$user->id]) }}" target="_blank"><i class="ni ni-archive-2"></i> {{ __('Ver menus') }}</a>
                                             <a class="btn btn-default btn-sm" href="{{ route('user.edit', [$user->id]) }}" target="_blank">
                                                 <i class="far fa-edit"> {{ __('Editar') }} </i>
                                             </a>

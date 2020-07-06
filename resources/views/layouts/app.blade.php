@@ -21,7 +21,8 @@
         <!-- Argon CSS -->
         <link type="text/css" href="{{ asset('argon') }}/css/argon.css?v=1.0.0" rel="stylesheet">
         <!-- DataTables CSS -->
-        <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+        <!--<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">-->
+        <link rel="stylesheet" href="{{ asset('js/datatables/datatables.min.css') }}">
         <style>
             #input_name {
                 text-transform:capitalize !important;
@@ -50,11 +51,12 @@
         @stack('js')
         <script src="{{ asset('argon') }}/vendor/jquery/dist/jquery.min.js"></script>
         <!-- DataTables JS -->
-        <script src = "http://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+        <!--<script src="http://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>-->
+        <script src="{{ asset('js/datatables/datatables.min.js') }}"></script>
+        <script src="{{ asset('js/datatables/accent-neutralise.js') }}"></script>
+
         <!-- Bootstrap JS -->
         <script src="{{ asset('argon') }}/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- TableEdit JS -->
-        <script src="https://markcell.github.io/jquery-tabledit/assets/js/tabledit.min.js"></script>
 
         <!-- Argon JS -->
         <script src="{{ asset('argon') }}/js/argon.js?v=1.0.0"></script>

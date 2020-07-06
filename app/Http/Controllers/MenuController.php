@@ -18,9 +18,28 @@ class MenuController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($user_id)
     {
-        //
+        if(Auth::user()->hasRole('nutritionist')){
+            if(request()->ajax()){
+                $menus = Menu::where('user_id', $user_id)
+                    ->where('status', 1)
+                    ->where('kind_of_menu', '<>', 0)
+                    ->select('id', 'name', 'description', 'kind_of_menu', 'created_at', 'updated_at')
+                    ->groupBy('name', 'description', 'id')
+                    ->get();
+                    return DataTables::of($menus)
+                    ->addColumn('action',function($row) {
+                        return  '<button class="btn btn-primary btn-sm text-center"><i class="far fa-edit"></i></button>';
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+            }
+            $patient = User::where('users.id', $user_id)
+                    ->join('patients', 'patients.id', '=', 'users.id')
+                    ->first();
+            return view('menus.index', ['patient' => $patient, 'role_id' => 2]);
+        }
     }
 
     /**
@@ -69,39 +88,37 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $menu_id = $request['menu_id'];
+        $name = $request['name'];
+        $description = $request['description'];
+        $kind_of = $request['kind_of'] ;
+        if( $kind_of == 0){
+            $kind_of_menu = 1;
+        }
+        if( $kind_of == 1){
+            $kind_of_menu = 1;
+        }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Menu  $menu
-     * @return \Illuminate\Http\Response
-     */
-    public function list($menu_id)
-    {
-        /* list all elements of menu
-        id = user_id
-        $data->id = id of component
-        */
-        if(request()->ajax()){
-            $data = DB::table('menus')
-                ->select('foods.*',
-                 'menus.id as menu_id', 'menus.name as menuname', 'menus.description', 'menus.user_id', 'menus.kind_of_menu', 'menus.status',
-                 'components.food_id', 'components.menu_id', 'components.food_weight', 'components.kind_of_food'
-                  )
-                ->join('components', 'components.menu_id', '=', 'menus.id')
-                ->join('foods', 'foods.id', '=', 'components.food_id')
-                ->where('menus.status', 1)
-                //->where('menus.kind_of_menu', 0)
-                ->where('menus.id', $menu_id)
-                ->get();
-                return DataTables::of($data)
-                ->addColumn('action',function($row) {
-                    return  '<button class="btn btn-primary btn-sm text-center"><i class="far fa-edit"></i></button>';
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+        try {
+            DB::beginTransaction();
+            Menu::where('id', $menu_id)
+                ->update([
+                    'name' => $name,
+                    'description' => $description,
+                    'kind_of_menu' => $kind_of_menu
+                ]);
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => __('Menú guardado correctamente. A continuación será redireccionado a sus menús')]);
+
+        }catch(\Illuminate\Database\QueryException $ex){
+            DB::rollback();
+            $message = __('Ocurrió un error, vuelve a intentarlo');
+            return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
+        }
+        catch(\Exception $ex){
+            DB::rollback();
+            $message = __('Ocurrió un error, vuelve a intentarlo');
+            return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
         }
     }
 
@@ -148,9 +165,32 @@ class MenuController extends Controller
      * @param  \App\Menu  $menu
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Menu $menu)
+    public function update(Request $request)
     {
-        //
+        $menu_id = $request['menu_id'];
+        $name = $request['menu_name'];
+        $description = $request['menu_description'];
+        try {
+            DB::beginTransaction();
+            Menu::where('id', $menu_id)
+                ->update([
+                    'name' => $name,
+                    'description' => $description,
+                    'updated_at' => Carbon::now()
+                ]);
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => __('Menú actualizado correctamente')]);
+
+        }catch(\Illuminate\Database\QueryException $ex){
+            DB::rollback();
+            $message = __('Ocurrió un error, vuelve a intentarlo');
+            return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
+        }
+        catch(\Exception $ex){
+            DB::rollback();
+            $message = __('Ocurrió un error, vuelve a intentarlo');
+            return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
+        }
     }
 
     /**
@@ -162,5 +202,60 @@ class MenuController extends Controller
     public function destroy(Menu $menu)
     {
         //
+    }
+
+    /**
+     * List menu items
+     *
+     * @param  \App\Menu  $menu
+     * @return \Illuminate\Http\Response
+     */
+    public function list($menu_id)
+    {
+        if(request()->ajax()){
+            $data = DB::table('menus')
+                ->select('foods.*',
+                 'menus.id as menu_id', 'menus.name as menuname', 'menus.description', 'menus.user_id', 'menus.kind_of_menu', 'menus.status',
+                 'components.id', 'components.food_id', 'components.menu_id', 'components.food_weight', 'components.kind_of_food'
+                  )
+                ->join('components', 'components.menu_id', '=', 'menus.id')
+                ->join('foods', 'foods.id', '=', 'components.food_id')
+                ->where('menus.status', 1)
+                //->where('menus.kind_of_menu', 0)
+                ->where('menus.id', $menu_id)
+                ->get();
+                return DataTables::of($data)
+                ->addColumn('action',function($row) {
+                    return  '<button class="btn btn-primary btn-sm text-center"><i class="far fa-edit"></i></button>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+    }
+    /**
+     * Delete menu items
+     */
+    public function empty(Request $request){
+        $menu_id = $request['menu_id'];
+        try {
+            DB::table('components')
+            ->where('menu_id', $menu_id)
+            ->delete();
+            $msg = ['status' => 'success', 'message' => __('Los elementos del menú han sido borrados correctamente')];
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            DB::rollback();
+            $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage() ];
+            return response()->json($msg, 400);
+        }
+        catch(\Exception $ex){
+            DB::rollback();;
+            $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage() ];
+            return response()->json($msg, 400);
+        }
+        finally{
+            DB::commit();
+            return response()->json($msg);
+        }
     }
 }
