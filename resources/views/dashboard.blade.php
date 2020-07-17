@@ -10,9 +10,8 @@
                     <div class="card-header bg-transparent">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h6 class="text-uppercase text-center text-light ls-1 mb-1">{{ __('Bienvenido') }}</h6>
+                                <h6 class="text-uppercase text-center text-light ls-1 mb-1">{{ __('Bienvenido') }} {!! $user->name !!} {!! $user->id !!}</h6>
                                 <h2 class="text-white mb-0">{{ __('Observaciones') }}</h2>
-                                <h2>role_id: {!! $role_id !!}</h2>
                             </div>
                         </div>
                     </div>

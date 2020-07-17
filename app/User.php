@@ -6,11 +6,15 @@ use App\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
+    use QueryCacheable;
+
+    public $cacheFor = 3600; // cache time, in seconds
     /**
      * The attributes that are mass assignable.
      *

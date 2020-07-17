@@ -8,6 +8,7 @@
     <div class="container-fluid mt--7">
         <input type="hidden" id="list_user_menus_route" value="{{ route('menu.index', [$patient->id]) }}">
         <input type="hidden" id="update_menu_route" value="{{ route('menu.update') }}">
+        <input type="hidden" id="delete_menu_route" value="{{ route('menu.delete') }}">
         <input type="hidden" id="menu_type_1" value="{{ __('Menú propio') }}">
         <input type="hidden" id="menu_type_2" value="{{ __('Menú guardado desde otro usuario') }}">
         <input type="hidden" id="menu_type_3" value="{{ __('Menú modificado de otro usuario') }}">
@@ -52,7 +53,9 @@
             </div>
         </div>
         @include('helpers.alerts')
-        @include('helpers.menus.editMenu')
+        @include('helpers.menus.showMenu')
+        @include('helpers.menus.saveMenu')
+        @include('helpers.menus.deleteMenu')
         @include('layouts.footers.auth')
     </div>
 @endsection

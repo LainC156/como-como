@@ -28,6 +28,7 @@
                         </div>
                     </div>
                 </div>
+                @if($role_id == 3)
                 <div class="col-xl-3 col-lg-6">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
@@ -44,7 +45,7 @@
                             </div>
                             <p class="mt-3 mb-0 text-muted text-sm">
                                 <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> {{ __('Es necesario completar tu perfil para poder empezar a crear menús') }}</span>
-                                <a href="{{ route('profile.edit') }}"><span class="text-nowrap">{{ __('Editar perfil') }}</span></a>
+                                <a href="{{ route('profile.edit', auth()->user()->id) }}"><span class="text-nowrap">{{ __('Editar perfil') }}</span></a>
                             </p>
                         </div>
                     </div>
@@ -60,7 +61,7 @@
                                 </div>
                                 <div class="col">
                                     <h5 class="card-title text-uppercase text-muted mb-0">{{ __('Menús creados') }}</h5>
-                                    <span class="h2 font-weight-bold mb-0">3</span>
+                                    <span class="h2 font-weight-bold mb-0">{!! $menus !!}</span>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-muted text-sm">
@@ -91,6 +92,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

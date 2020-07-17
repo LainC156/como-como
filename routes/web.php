@@ -36,26 +36,40 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/user/update', 'UserController@update')->name('user.update');
     Route::post('/user/{id}/delete', 'UserController@destroy')->name('user.destroy');
     Route::post('/avatar/{id}/update', 'UserController@updateAvatar')->name('avatar.update');
-
-	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'ProfileController@edit']);
+    /* edit user profile */
+	Route::get('profile/{id}', 'ProfileController@edit')->name('profile.edit');
 	Route::put('profile', ['as' => 'profile.update', 'uses' => 'ProfileController@update']);
     Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'ProfileController@password']);
         /* menus routes */
     Route::get('/menu/{id}/create', 'MenuController@create')->name('menu.create');
     Route::post('menu/store', 'MenuController@store')->name('menu.store');
     Route::post('/updatemenu', 'MenuController@update')->name('menu.update');
-    Route::post('deletemenu','MenuController@delete')->name('menu.delete');
+    Route::post('deletemenu','MenuController@destroy')->name('menu.delete');
     Route::get('/user/{id}/menus', 'MenuController@index')->name('menu.index');
+    Route::get('/menu/{id}/show', 'MenuController@show')->name('menu.show');
+    Route::get('/menu/{id}/edit', 'MenuController@edit')->name('menu.edit');
     Route::get('/menu/{id}/list', 'MenuController@list')->name('menu.list');
-    Route::get('/user/{id}/menu/{menu_id}/edit', 'MenuController@editMenuSaved')->name('menu.edit');
     Route::post('emptymenu', 'MenuController@empty')->name('empty.menu');
-    Route::get('user/{id}/menu/{menu_id}/results', 'MenuController@results')->name('menu.results');
+    Route::get('/menu/{id}/results', 'MenuController@results')->name('menu.results');
+    Route::get('/search', 'MenuController@search')->name('menu.search');
+    Route::post('/searchresults', 'MenuController@searchResults')->name('menu.searchresults');
         /* foods routes */
     Route::post('/addfood', 'FoodController@addFood')->name('food.add');
     Route::get('listfood', 'FoodController@foodList')->name('food.list');
+    Route::get('/foodswithmorenutrients/{id}/{menu_id}', 'FoodController@foodsWithMoreNutrients');
         /* components routes */
     Route::post('/updatecomponent', 'FoodController@update')->name('component.update');
     Route::post('/deletecomponent', 'FoodController@destroy')->name('component.destroy');
-
+        /* social routes */
+    Route::get('/social', 'SocialController@index')->name('social.index');
+    Route::get('/social/{id}/menu', 'SocialController@show')->name('social.show');
+    Route::post('sociallike', 'SocialController@like')->name('social.like');
+    Route::post('socialcomment', 'SocialController@comment')->name('social.comment');
+        /* payments routes */
+    Route::get('/subscription', 'PaymentController@index')->name('payment.index');
+        /* paypal */
+    Route::get('paypal/express-checkout', 'PaymentController@expressCheckout')->name('paypal.express-checkout');
+    Route::get('paypal/express-checkout-success', 'PaymentController@expressCheckoutSuccess');
+    Route::post('paypal/notify', 'PaymentController@notify');
 });
 

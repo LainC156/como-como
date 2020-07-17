@@ -157,8 +157,8 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        if(Auth::user()->hasRole('nutritionist')){
-            $patient_id = $request['patient_id'];
+        if(Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')){
+            $patient_id = $request['user_id'];
             $name = $request['name'];
             $last_name = $request['last_name'];
             $identificator = $request['identificator'];
@@ -256,7 +256,7 @@ class UserController extends Controller
      *
      */
     public function updateAvatar(Request $request, $id) {
-        if(Auth::user()->hasRole('nutritionist')){
+        if(Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')){
             /* validate image width, height */
             $val = $this->validate($request, [
                 'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg,dimensions:max_width:700,max_height:500'

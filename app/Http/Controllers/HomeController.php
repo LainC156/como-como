@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Menu;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -24,15 +26,21 @@ class HomeController extends Controller
     public function index()
     {
         if( Auth::user()->hasRole('nutritionist')) {
-            $user = Auth::user()
+            $user = Auth::user();
+            $user_data = User::where('users.id', $user->id)
                     ->join('payments as p','p.user_id', '=', 'users.id')
                     ->first();
-            $role_id = 2;
+            return view('dashboard', ['role_id' => 2, 'user' => $user_data]);
         }else if( Auth::user()->hasRole('patient')) {
-            $role_id = 3;
+            $user = Auth::user();
+            $user_data = User::where('users.id', $user->id)
+                    ->join('payments as p','p.id', '=', 'users.id')
+                    ->first();
+            //dd($user);
+            $menus = Menu::where('user_id', $user->id)->count();
+            return view('dashboard', ['role_id' => 3, 'menus' => $menus, 'user' => $user_data]);
         }else if( Auth::user()->hasRole('admin')) {
             $role_id = 1;
         }
-        return view('dashboard', ['role_id' => $role_id, 'user' => $user]);
     }
 }

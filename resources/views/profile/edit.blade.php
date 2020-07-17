@@ -1,13 +1,17 @@
-@extends('layouts.app', ['title' => __('User Profile')])
+@extends('layouts.app', ['title' => __('Perfil del usuario')])
 
 @section('content')
     @include('users.partials.header', [
-        'title' => __('Hello') . ' '. auth()->user()->name,
+        'title' => __('Editar perfil'),
         'description' => __('This is your profile page. You can see the progress you\'ve made with your work and manage your projects or assigned tasks'),
-        'class' => 'col-lg-7'
-    ])   
+        'class' => 'col-lg-12'
+    ])
 
     <div class="container-fluid mt--7">
+        <input type="hidden" id="user_id" value="{{ $user->id }}">
+        <input id="user_update_route" type="hidden" value="{{ route('user.update') }}">
+        <input id="home_route" type="hidden" value="{{ route('home') }}">
+        <input type="hidden" id="update_avatar_route" value="{{ route('avatar.update',$user->id) }}">
         <div class="row">
             <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
                 <div class="card card-profile shadow">
@@ -15,24 +19,103 @@
                         <div class="col-lg-3 order-lg-2">
                             <div class="card-profile-image">
                                 <a href="#">
-                                    <img src="{{ asset('argon') }}/img/theme/team-4-800x800.jpg" class="rounded-circle">
+                                    <img src="{{ asset('img/avatar/'.$user->avatar) }}" class="rounded-circle">
                                 </a>
                             </div>
                         </div>
                     </div>
                     <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
                         <div class="d-flex justify-content-between">
-                            <a href="#" class="btn btn-sm btn-info mr-4">{{ __('Connect') }}</a>
-                            <a href="#" class="btn btn-sm btn-default float-right">{{ __('Message') }}</a>
                         </div>
                     </div>
                     <div class="card-body pt-0 pt-md-4">
+                        @if($role_id == 3)
+                        <div class="row">
+                            <div class="col">
+                                @include('helpers.alerts')
+                            </div>
+                        </div>
+                        <!-- USER PROFILE AVATAR -->
+                        <div class="row">
+                            <div class="col">
+                                <form action="javascript:void(0)" method="POST" enctype="multipart/form-data" id="upload_avatar">
+                                    <input id="img_avatar" class="btn btn-sm btn-info mr-4" name="avatar" type="file" class="form-control" accept="image/*">
+                                    <button id="update_avatar_btn" type="submit" class="btn btn-sm btn-default float-right">{{ __('Actualizar avatar') }}</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <!-- user name-->
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input_name">{{ __('Nombre') }}
+                                        <span id="name_required" style="color: red;">*</span>
+                                        <span id="name_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    </label>
+                                    <input type="text" name="input_name" id="input_name" class="form-control form-control-alternative capitalize" value="{{ $user->name }}" placeholder="{{ __('Nombre') }}" autofocus>
+                                </div>
+                                <!-- user last_name-->
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input_last_name">{{ __('Apellidos') }}
+                                        <span id="last_name_required" style="color: red;">*</span>
+                                        <span id="last_name_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    </label>
+                                    <input type="text" name="input_name" id="input_last_name" class="form-control form-control-alternative" value="{{ $user->last_name }}" placeholder="{{ __('Apellidos') }}">
+                                </div>
+                                <!-- user email  -->
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-email">{{ __('Correo electrónico') }}
+                                        <span id="email_required" style="color: red;">*</span>
+                                        <span id="email_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="email_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="email" name="input_email" id="input_email" class="form-control form-control-alternative" value="{{ $user->email }}" placeholder="{{ __('Correo electrónico') }}" >
+                                </div>
+                                <!-- user password-->
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-password">{{ __('Contraseña') }}
+                                        <span id="password_required" style="color: red;">*</span>
+                                        <span id="password_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="password_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="password" name="input_password" id="input_password" class="form-control form-control-alternative" placeholder="{{ __('Contraseña') }}">
+                                </div>
+                                <!-- user password confirmation -->
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input_password_confirmation">{{ __('Confirmar contraseña') }}
+                                        <span id="password_confirmation_required" style="color: red;">*</span>
+                                        <span id="password_confirmation_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="password_confirmation_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="password" name="input_password_confirmation" id="input_password_confirmation" class="form-control form-control-alternative" placeholder="{{ __('Confirmar contraseña') }}" value="" >
+                                </div>
+                                <div class="text-muted font-italic">
+                                    <small id="password_alert" class="text-success font-weight-700">{{ __('La contraseña debe de ser de al menos 8 caracteres') }}</small>
+                                    <small id="password_success"  style="display: none" class="text-success font-weight-700">{{ __('Las contraseñas coinciden') }}</small>
+                                    <small id="password_mismatch" style="display: none" class="text-warning font-weight-700">{{ __('Las contraseñas no coinciden') }}</small>
+                                </div>
+                                <!-- user CURP/ID -->
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-identificator" >
+                                        {{ __('CURP') }}/{{ __('ID') }}
+                                        <span id="identificator_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="identificator_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="text" data-toggle="tooltip" data-placement="top"
+                                    oninput="this.value = this.value.toUpperCase()"
+                                    name="input_identificator" id="input_identificator" class="form-control form-control-alternative" value="{{ $user->identificator }}" placeholder="{{ __('CURP') }}/{{ __('ID') }}">
+
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                        @if($role_id == 2)
                         <div class="row">
                             <div class="col">
                                 <div class="card-profile-stats d-flex justify-content-center mt-md-5">
                                     <div>
                                         <span class="heading">22</span>
-                                        <span class="description">{{ __('Friends') }}</span>
+                                        <span class="description">{{ __('Pacientes') }}</span>
                                     </div>
                                     <div>
                                         <span class="heading">10</span>
@@ -45,128 +128,186 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <h3>
-                                {{ auth()->user()->name }}<span class="font-weight-light">, 27</span>
-                            </h3>
-                            <div class="h5 font-weight-300">
-                                <i class="ni location_pin mr-2"></i>{{ __('Bucharest, Romania') }}
-                            </div>
-                            <div class="h5 mt-4">
-                                <i class="ni business_briefcase-24 mr-2"></i>{{ __('Solution Manager - Creative Tim Officer') }}
-                            </div>
-                            <div>
-                                <i class="ni education_hat mr-2"></i>{{ __('University of Computer Science') }}
-                            </div>
-                            <hr class="my-4" />
-                            <p>{{ __('Ryan — the name taken by Melbourne-raised, Brooklyn-based Nick Murphy — writes, performs and records all of his own music.') }}</p>
-                            <a href="#">{{ __('Show more') }}</a>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
+            @if($role_id == 3)
             <div class="col-xl-8 order-xl-1">
                 <div class="card bg-secondary shadow">
                     <div class="card-header bg-white border-0">
                         <div class="row align-items-center">
-                            <h3 class="col-12 mb-0">{{ __('Edit Profile') }}</h3>
+                            <h3 class="col-12 mb-0">{{ __('Información del usuario') }}</h3>
                         </div>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="{{ route('profile.update') }}" autocomplete="off">
-                            @csrf
-                            @method('put')
-
-                            <h6 class="heading-small text-muted mb-4">{{ __('User information') }}</h6>
-                            
-                            @if (session('status'))
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    {{ session('status') }}
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <!--weight -->
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label " for="input_weight">{{__('Peso')}}(kg.)</label>
+                                        <span id="weight_required" style="display:none" class="text-red">*</span>
+                                        <span id="weight_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="weight_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                        <input type="number" name="input_weight" id="input_weight" class="form-control form-control-alternative" value="{{ $user->weight }}" placeholder="{{ __('Peso') }}">
+                                    </div>
                                 </div>
-                            @endif
-
-                            <div class="pl-lg-4">
-                                <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
-                                    <label class="form-control-label" for="input-name">{{ __('Name') }}</label>
-                                    <input type="text" name="name" id="input-name" class="form-control form-control-alternative{{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="{{ __('Name') }}" value="{{ old('name', auth()->user()->name) }}" required autofocus>
-
-                                    @if ($errors->has('name'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('name') }}</strong>
-                                        </span>
-                                    @endif
+                                <!-- height -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_height">{{ __('Estatura') }}(cm.)</label>
+                                    <span id="height_required" style="display:none" class="text-red">*</span>
+                                    <span id="height_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    <span id="height_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    <input type="number" name="input_height" id="input_height" class="form-control form-control-alternative" value="{{ $user->height }}" placeholder="{{ __('Estatura') }}">
                                 </div>
-                                <div class="form-group{{ $errors->has('email') ? ' has-danger' : '' }}">
-                                    <label class="form-control-label" for="input-email">{{ __('Email') }}</label>
-                                    <input type="email" name="email" id="input-email" class="form-control form-control-alternative{{ $errors->has('email') ? ' is-invalid' : '' }}" placeholder="{{ __('Email') }}" value="{{ old('email', auth()->user()->email) }}" required>
-
-                                    @if ($errors->has('email'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('email') }}</strong>
-                                        </span>
-                                    @endif
+                                <!--birthdate -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_birthdate">{{ __('Fecha de nacimiento') }}</label>
+                                    <span id="birthdate_required" style="display:none" class="text-red">*</span>
+                                    <span id="birthdate_check" style="display:none" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    <span id="birthdate_error" style="display:none" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    <input type="date" name="input_birthdate" id="input_birthdate" class="form-control form-control-alternative" value="{{ $user->birthdate }}" placeholder="{{ __('Fecha de nacimiento') }}">
                                 </div>
 
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-success mt-4">{{ __('Save') }}</button>
+                            </div>
+                            <div class="row">
+                                <!-- genre -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_genre">{{ __('Género') }}</label>
+                                    <span id="genre_required" style="display:none" class="text-red">*</span>
+                                    <span id="genre_check" style="display:none" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    <span id="genre_error" style="display:none" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    <select class="form-control select" name="input_genre" id="select_genre">
+                                        @if($user->genre == 0)
+                                        <option value="-1" disabled>{{ __('Género') }}</option>
+                                        <option value="0" selected>{{ __('Hombre') }}</option>
+                                        <option value="1">{{ __('Mujer') }}</option>
+                                        @elseif($user->genre == 1)
+                                        <option value="-1" disabled>{{ __('Género') }}</option>
+                                        <option value="0" >{{ __('Hombre') }}</option>
+                                        <option value="1" selected>{{ __('Mujer') }}</option>
+                                        @else
+                                        <option value="-1" selected disabled>{{ __('Género') }}</option>
+                                        <option value="0">{{ __('Hombre') }}</option>
+                                        <option value="1">{{ __('Mujer') }}</option>
+                                        @endif
+                                    </select>
+                                </div>
+                                <!-- psychical activity -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_psychical_activity">{{ __('Actividad física') }}</label>
+                                    <span id="psychical_activity_required" style="display:none" class="text-red">*</span>
+                                    <span id="psychical_activity_check" style="display:none" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    <span id="psychical_activity_error" style="display:none" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    <select class="form-control select" name="input_psychical_activity" id="select_psychical_activity">
+                                        @if($user->psychical_activity == 0)
+                                        <option value="-1" disabled>{{ __('Actividad física') }}</option>
+                                        <option value="0" selected>{{ __('Reposo') }}</option>
+                                        <option value="1">{{ __('Ligera') }}</option>
+                                        <option value="2">{{ __('Moderada') }}</option>
+                                        <option value="3">{{ __('Intensa') }}</option>
+                                        @elseif($user->psychical_activity == 1)
+                                        <option value="-1" disabled>{{ __('Actividad física') }}</option>
+                                        <option value="0">{{ __('Reposo') }}</option>
+                                        <option value="1" selected>{{ __('Ligera') }}</option>
+                                        <option value="2">{{ __('Moderada') }}</option>
+                                        <option value="3">{{ __('Intensa') }}</option>
+                                        @elseif($user->psychical_activity == 2)
+                                        <option value="-1" disabled>{{ __('Actividad física') }}</option>
+                                        <option value="0">{{ __('Reposo') }}</option>
+                                        <option value="1">{{ __('Ligera') }}</option>
+                                        <option value="2" selected>{{ __('Moderada') }}</option>
+                                        <option value="3">{{ __('Intensa') }}</option>
+                                        @elseif($user->psychical_activity == 3)
+                                        <option value="-1" disabled>{{ __('Actividad física') }}</option>
+                                        <option value="0">{{ __('Reposo') }}</option>
+                                        <option value="1">{{ __('Ligera') }}</option>
+                                        <option value="2">{{ __('Moderada') }}</option>
+                                        <option value="3" selected>{{ __('Intensa') }}</option>
+                                        @else
+                                        <option value="-1" selected disabled>{{ __('Actividad física') }}</option>
+                                        <option value="0">{{ __('Reposo') }}</option>
+                                        <option value="1">{{ __('Ligera') }}</option>
+                                        <option value="2">{{ __('Moderada') }}</option>
+                                        <option value="3">{{ __('Intensa') }}</option>
+                                        @endif
+                                    </select>
                                 </div>
                             </div>
-                        </form>
-                        <hr class="my-4" />
-                        <form method="post" action="{{ route('profile.password') }}" autocomplete="off">
-                            @csrf
-                            @method('put')
-
-                            <h6 class="heading-small text-muted mb-4">{{ __('Password') }}</h6>
-
-                            @if (session('password_status'))
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    {{ session('password_status') }}
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            @endif
-
-                            <div class="pl-lg-4">
-                                <div class="form-group{{ $errors->has('old_password') ? ' has-danger' : '' }}">
-                                    <label class="form-control-label" for="input-current-password">{{ __('Current Password') }}</label>
-                                    <input type="password" name="old_password" id="input-current-password" class="form-control form-control-alternative{{ $errors->has('old_password') ? ' is-invalid' : '' }}" placeholder="{{ __('Current Password') }}" value="" required>
-                                    
-                                    @if ($errors->has('old_password'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('old_password') }}</strong>
-                                        </span>
-                                    @endif
-                                </div>
-                                <div class="form-group{{ $errors->has('password') ? ' has-danger' : '' }}">
-                                    <label class="form-control-label" for="input-password">{{ __('New Password') }}</label>
-                                    <input type="password" name="password" id="input-password" class="form-control form-control-alternative{{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{ __('New Password') }}" value="" required>
-                                    
-                                    @if ($errors->has('password'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('password') }}</strong>
-                                        </span>
-                                    @endif
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-password-confirmation">{{ __('Confirm New Password') }}</label>
-                                    <input type="password" name="password_confirmation" id="input-password-confirmation" class="form-control form-control-alternative" placeholder="{{ __('Confirm New Password') }}" value="" required>
+                            <div class="row">
+                                <div class="col">
+                                    <!-- caloric requirement -->
+                                    <label class="form-control-label" for="input-caloric-requirement">{{ __('Requerimiento calórico') }}</label>
+                                    <span id="caloric_requirement_required" class="text-red">*</span>
+                                    <span id="caloric_requirement_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                    <span id="caloric_requirement_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="custom-radio-1" class="custom-control-input" id="automatic_calculation" type="radio">
+                                                <label class="custom-control-label" for="automatic_calculation">{{ __('Cálculo automático') }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="custom-radio-1" class="custom-control-input" id="custom_calculation" checked="" type="radio">
+                                                <label class="custom-control-label" for="custom_calculation">{{ __('Personalizado') }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" name="input_caloric_requirement" id="input_caloric_requirement"
+                                            data-toggle="tooltip" data-placement="top"
+                                            placeholder="{{ __('Requerimiento calórico') }}"
+                                            value="{{ $user->caloric_requirement }}" class="form-control form-control-alternative text-center">
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-success mt-4">{{ __('Change password') }}</button>
+                            </div>
+                            <hr class="my-4">
+                            <h6 class="heading-small  mb-4" id="required">{{ __('Valores antropométricos') }}</h6>
+                            <div class="row">
+                                <!--Anthropometric values -->
+                                <!-- waist size -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_waist_size">{{ __('Tamaño de la cintura') }} (cm.)
+                                        <span id="waist_size_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="waist_size_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="number" name="input_waist_size" id="input_waist_size" class="form-control form-control-alternative" value="{{ $user->waist_size }}" placeholder="{{ __('Tamaño de la cintura') }}">
+                                </div>
+                                <!-- size of the legs -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_legs_size">{{ __('Tamaño de las piernas') }} (cm.)
+                                        <span id="legs_size_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="legs_size_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="number" name="input_legs_size" id="input_legs_size" class="form-control form-control-alternative" value="{{ $user->legs_size }}" placeholder="{{ __('Tamaño de las piernas') }}(cm.)">
+                                </div>
+                                <!-- wrist size -->
+                                <div class="col">
+                                    <label class="form-control-label" for="input_wrist_size">{{ __('Tamaño de las muñecas') }} (cm.)
+                                        <span id="wrist_size_check" style="display:none;" class="text-green"><i class="ni ni-check-bold"></i></span>
+                                        <span id="wrist_size_error" style="display:none;" class="text-red"><i class="ni ni-fat-remove"></i></span>
+                                    </label>
+                                    <input type="number" name="input_wrist_size" id="input_wrist_size" class="form-control form-control-alternative" value="{{ $user->wrist_size }}" placeholder="{{ __('Tamaño de las muñecas') }}">
                                 </div>
                             </div>
-                        </form>
+                        </div>
+                    </div> <!-- end card body-->
+                    <div class="card-footer">
+                        <button class="btn btn-success btn-block" id="update_user_btn"><i class="ni ni-fat-add"></i>{{ __('Actualizar perfil') }}</button>
                     </div>
                 </div>
             </div>
         </div>
-        
-        @include('layouts.footers.auth')
     </div>
+    @endif
+
+        @include('layouts.footers.auth')
+@endsection
+@section('javascript')
+    <script src="{{ asset('js/profile/edit.js') }}"></script>
+    <script src="{{ asset('js/alerts.js') }}"></script>
 @endsection

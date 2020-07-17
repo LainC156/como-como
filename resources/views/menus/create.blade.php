@@ -55,12 +55,18 @@
                                     </div>
                                     <div class="col">
                                         @if( $required == 1 )
-                                            <a id="btn_generate_results" class="btn btn-primary btn-outline-primary btn-sm" href="{{ route('menu.results', ['id' => $patient->id, 'menu_id' => $menu->id]) }}" target="_blank" ><i class="ni ni-chart-bar-32"></i>{{ __('Generar resultados') }}</a>
+                                            <a class="btn btn-primary btn-outline-primary btn-sm" href="{{ route('menu.results', ['id' => $menu->id]) }}" target="_blank" ><i class="ni ni-chart-bar-32"></i>{{ __('Generar resultados') }}</a>
                                         @elseif( $required == 0 )
                                             <p class="description text-danger">{{ __('Este perfil no cuenta con los datos suficientes para realizar los cálculos correspondientes, da clic en ') }} {{ __('Actualizar perfil') }} {{ __('para actualizar los datos faltantes') }}. {{ __('Después de añadir los datos faltantes, vuelve aquí y actualiza la página') }}.</p>
-                                            <a class="btn btn-warning btn-sm"data-toggle="tooltip" data-placement="top"
+                                            @if($role_id == 2)
+                                                <a class="btn btn-warning btn-sm"data-toggle="tooltip" data-placement="top"  target="_blank"
                                                 title="{{ __('Para poder generar los resultados del paciente, se requiere: edad, peso, estatura, tipo de actividad física y requerimiento calórico del mismo') }}"
-                                                href="{{ route('user.edit', [$patient->id] ) }}" ><i class="far fa-edit" aria-hidden="true"></i>{{ __('Actualizar perfil') }}</a>
+                                                href="{{ route('user.edit', [$patient->id] ) }}"><i class="far fa-edit" aria-hidden="true"></i>{{ __('Actualizar perfil') }}</a>
+                                            @elseif($role_id == 3)
+                                            <a class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top"  target="_blank"
+                                            title="{{ __('Para poder generar los resultados se requiere: edad, peso, estatura, tipo de actividad física y requerimiento calórico') }}"
+                                            href="{{ route('profile.edit', auth()->user()->id ) }}"><i class="far fa-edit" aria-hidden="true"></i>{{ __('Actualizar perfil') }}</a>
+                                            @endif
                                         @endif
                                         @if( $menu->kind_of_menu == 0 )
                                         <a class="btn btn-success btn-outline-success btn-sm" id="btn_save_m" data-toggle="modal" data-target="#saveMenuModal"><i class="ni ni-folder-17" aria-hidden="true"></i>{{ __('Guardar menú') }} </a>

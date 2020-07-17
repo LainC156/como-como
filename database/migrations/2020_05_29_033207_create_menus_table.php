@@ -14,6 +14,7 @@ class CreateMenusTable extends Migration
      *
      * status: 1 = in use, 0 = deleted
      * ideal: 1 = true, 0 = false
+     *
      * @return void
      */
     public function up()
@@ -26,6 +27,9 @@ class CreateMenusTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('kind_of_menu')->default(0);
             $table->boolean('status')->default('1');
+            $table->boolean('ideal')->default(0);
+            $table->integer('times_downloaded')->default(0);
+            $table->integer('original_owner')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

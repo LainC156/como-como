@@ -7,7 +7,8 @@
         let component_id = 0;
         let patient_id = $("#patient_id").val();
         let url = $("#list_menu").val();
-        let url_menu_table_data = $("#kind_of_menu").val() == 0 ? url : $("#edit_saved_menu").val();
+        console.log('url: ', url);
+        //let url_menu_table_data = $("#kind_of_menu").val() == 0 ? url : $("#edit_saved_menu").val();
         let food_name_validation = 0;
         let food_amount = 0;
         let food_time_id = 0;
@@ -71,7 +72,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: url_menu_table_data,
+                url: $("#list_menu").val(),
                 type: 'GET',
             },
             columns: [{
@@ -234,10 +235,11 @@
                     msg = data.message;
                     console.log('mensaje: ' + msg);
                     showSuccessMessage(msg);
-                    /* reset fields */
+                    /* reset fields and disabled add_food */
                     $("#food_name").val('');
                     $("#food_amount").val('');
                     $('input[type=search]').val('').change();
+                    $("#add_food").attr('disabled', true);
                     menu_table.ajax.reload();
                     check_menu_table_size();
                     console.log('valor de food_id: ' + food_id);
@@ -364,7 +366,7 @@
                 name: name,
                 description: description,
                 menu_id: menu_id,
-                kind_of: 0
+                kind_of: 1
             };
 
             console.log('name: ' + name + ', desc: ' + description + ', menu_id: ' + menu_id);
@@ -393,7 +395,7 @@
 
         });
         /* delete components added to the actual menu */
-        $("#btn_delete_menu").click(function() {
+        $("#delete_menu_btn").click(function() {
             console.log('menu_id: ' + menu_id);
             $.ajax({
                 data: { menu_id },

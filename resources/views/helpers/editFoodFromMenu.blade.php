@@ -39,7 +39,7 @@
                                     <!-- food weight -->
                                 <div class="col">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="edit_component_amount">{{ __('Cantidad(ml./gr.)') }}</label>
+                                        <label class="form-control-label" for="edit_component_amount">{{ __('Peso(ml./gr.)') }}</label>
                                         <div class="input-group input-group-alternative">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
@@ -60,7 +60,7 @@
                                                     <option value="-1" disabled>{{ __('Tipo de comida') }}</option>
                                                     <option value="0">{{ __('Desayuno') }}</option>
                                                     <option value="1">{{ __('Colación matutina') }}</option>
-                                                    <option value="2">{{ __('Almuerzo') }}</option>
+                                                    <option value="2">{{ __('Comida') }}</option>
                                                     <option value="3">{{ __('Colación vespertina') }}</option>
                                                     <option value="4">{{ __('Cena') }}</option>
                                                 </select>

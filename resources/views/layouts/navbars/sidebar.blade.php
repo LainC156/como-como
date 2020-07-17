@@ -15,7 +15,7 @@
                 <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="media align-items-center">
                         <span class="avatar avatar-sm rounded-circle">
-                        <img alt="Image placeholder" src="{{ asset('argon') }}/img/theme/team-1-800x800.jpg">
+                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.auth()->user()->avatar) }}">
                         </span>
                     </div>
                 </a>
@@ -23,7 +23,7 @@
                     <div class=" dropdown-header noti-title">
                         <h6 class="text-overflow m-0">{{ __('¡Bienvenido!') }}</h6>
                     </div>
-                    <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                    <a href="{{ route('profile.edit',auth()->user()->id) }}" class="dropdown-item">
                         <i class="ni ni-single-02"></i>
                         <span>{{ __('Mi perfil') }}</span>
                     </a>
@@ -99,7 +99,7 @@
                     </a>
                     <div class="collapse show" id="navbar-examples">
                         <ul class="nav nav-sm flex-column">
-                    @if( $role_id != 3 )
+                    @if( $role_id == 2 )
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('user.create') }}">
                                 <i class="fa fa-user-plus" aria-hidden="true">
@@ -125,7 +125,14 @@
                     @endif
                             @if( $role_id == 3 )
                             <li class="nav-item">
-                                <a class="nav-link" href="">
+                                <a class="nav-link" href="{{ route('menu.create', auth()->user()->id) }}">
+                                    <i class="ni ni-folder-17" aria-hidden="true">
+                                        <span class="nav-link-text">{{ __('Menú nuevo') }}</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('menu.index', auth()->user()->id) }}">
                                     <i class="ni ni-single-copy-04" aria-hidden="true">
                                         <span class="nav-link-text">{{ __('Mis menús') }}</span>
                                     </i>
@@ -133,7 +140,7 @@
                             </li>
                             @endif
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('profile.edit') }}">
+                                <a class="nav-link" href="{{ route('profile.edit', auth()->user()->id) }}">
                                     <i class="fa fa-user" aria-hidden="true">
                                         <span class="nav-link-text">{{ __('Mi perfil') }}</span>
                                     </i>
@@ -143,19 +150,19 @@
                     </div>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="">
+                        <a class="nav-link" href="{{ route('menu.search') }}">
                             <i class="ni ni-planet text-blue"></i> {{ __('Buscar menús') }}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">
+                        <a class="nav-link" href="{{ route('social.index') }}">
                             <i class="ni ni-like-2 text-blue">
                             </i>
                             {{ __('Social') }}
                         </a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{{ route('payment.index') }}">
                                 <i class="ni ni-credit-card text-red"></i> {{ __('Suscripción') }}
                             </a>
                         </li>

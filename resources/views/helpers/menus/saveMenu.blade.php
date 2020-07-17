@@ -1,6 +1,6 @@
 <!-- save menu modal -->
 <div class="modal fade" id="saveMenuModal" tabindex="-1" role="dialog" aria-labelledby="saveMenuModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header alert-success">
                 <h3 class="modal-title mb-0" id="exampleModalLabel">{{ __('Guardar menú') }}</h3>
@@ -42,7 +42,7 @@
                     <p class="text-black">{{ __('Al guardar el menú, serás redireccionado a los menús disponibles del paciente') }}</p>
                 </div>
                 <div class="col">
-                    <input type="button" id="save_menu_btn" type="button" data-container="body" data-color="default" data-toggle="popover" data-placement="bottom" class="btn btn-success btn-block" disabled value="{{ __('Guardar') }}" />
+                    <button id="save_menu_btn" class="btn btn-success btn-block"><i class="ni ni-folder-17"></i> {{ __('Guardar') }}</button>
                 </div>
             </div>
         </div>

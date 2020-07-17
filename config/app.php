@@ -166,6 +166,7 @@ return [
          * Package Service Providers...
          */
         Yajra\DataTables\DataTablesServiceProvider::class,
+        Srmklive\PayPal\Providers\PayPalServiceProvider::class,
         /*
          * Application Service Providers...
          */

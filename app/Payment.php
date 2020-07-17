@@ -4,9 +4,14 @@ namespace App;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Payment extends Model
 {
+    use QueryCacheable;
+
+    public $cacheFor = 3600; // cache time, in seconds
+
     protected $fillable = ['user_id', 'trial_status', 'active', 'payment_status', 'recurring_id', 'price', 'currency_unit', 'payment_method', 'payment_date', 'expiration_date'
     ];
 

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Menu;
+use App\User;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\PasswordRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
@@ -13,10 +16,18 @@ class ProfileController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function edit()
+    public function edit($user_id)
     {
-        $role_id = 2;
-        return view('profile.edit', ['role_id' => $role_id]);
+        if(Auth::user()->hasRole('nutritionist')){
+            $user = User::where('users.id', $user_id)->first();
+            return view('profile.edit', ['user' => $user, 'role_id' => 2]);
+        } else if(Auth::user()->hasRole('patient')) {
+            $menus = Menu::where('user_id', $user_id)->count();
+            $user = User::where('users.id', $user_id)
+                        ->join('patients as p', 'p.user_id', '=', 'users.id')->first();
+            return view('profile.edit', ['user' => $user, 'menus' => $menus, 'role_id' => 3]);
+        }
+
     }
 
     /**
