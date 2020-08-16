@@ -11,9 +11,11 @@ use Srmklive\PayPal\Services\ExpressCheckout;
 
 class PaymentController extends Controller
 {
+    protected $provider;
     public function __construct() {
-        $this->provider = new expressCheckout();
+        $this->provider = new ExpressCheckout();
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -119,6 +121,15 @@ class PaymentController extends Controller
                 $recurring = false;
                 /* set new id in payments table */
                 $invoice_id = DB::table('payments')->count() + 1;
+                //dd($invoice_id);
+                // create new payment row
+                $payment = DB::table('payments')->insert([
+                            'user_id' => $user->id,
+                            'trial_status' => 0,
+                            'amount' => $amount_to_pay,
+                            'created_at' => Carbon::now()
+                ]);
+
                 // Get the cart data
                 $cart = $this->getCart($recurring, $invoice_id, $amount_to_pay);
                 //dd($cart);
@@ -126,10 +137,11 @@ class PaymentController extends Controller
                 // paypal should respond with an array of data
                 // the array should contain a link to paypal's payment system
                 $response = $this->provider->setExpressCheckout($cart, $recurring);
-                dd($response);
+                //dd($response);
                 // if there is no link(paypal's payment system) redirect back with error message
                 if (!$response['paypal_link']) {
-                    return redirect()->back()->with(['session' => 'error', 'message' => __('Algo salió mal con Paypal, intenta recargar la página e intenta de nuevo')]);
+                    DB::table('payments')->where('id', $invoice_id)->delete();
+                    return redirect()->back()->with('error', __('Algo salió mal con Paypal, intenta recargar la página e intenta de nuevo'));
                     // For the actual error message dump out $response and see what's in there
                 }
                 // redirect to paypal
@@ -191,7 +203,7 @@ class PaymentController extends Controller
         }
 
         public function expressCheckoutSuccess(Request $request) {
-            if( Auth::user()->hasRole('nutritrionist') ) {
+            if( Auth::user()->hasRole('nutritionist') ) {
                 /* user data */
                 $user = Auth::user();
                 /* count of how many patients manage this user */
@@ -207,7 +219,7 @@ class PaymentController extends Controller
                 else if( $patients > 150 && $patients<= 200)
                 $amount_to_pay = $patients * 19;
                 // check if payment is recurring
-                $recurring = $request->input('recurring', false) ? true : false;
+                $recurring = false;
 
                 $token = $request->get('token');
                 $PayerID = $request->get('PayerID');
@@ -228,6 +240,8 @@ class PaymentController extends Controller
                 // we need to explode the string and get the second element of array
                 // witch will be the id of the invoice
                 $invoice_id = explode('_', $response['INVNUM'])[1];
+                $invoice_id++;
+
 
                 // get cart data
                 $cart = $this->getCart($recurring, $invoice_id, $amount_to_pay);
@@ -248,14 +262,16 @@ class PaymentController extends Controller
                     // if payment is not recurring just perform transaction on Paypal
                     // and get the payment status
                     $payment_status = $this->provider->doExpressCheckoutPayment( $cart, $token, $PayerID);
+                    //dd($payment_status);
                     $status = $payment_status['PAYMENTINFO_0_PAYMENTSTATUS'];
                 }
 
                 // find invoice by id
+                //dd($invoice_id);
                 $invoice = DB::table('payments')->where('id', $invoice_id)->first();
-
+                //dd($status);
                 $invoice->payment_status = $status;
-
+                //dd($invoice->payment_status);
                 // if payment is recurring lets set a recurring id for latter use
                 if( $recurring === true ) {
                     $invoice->recurring_id = $response['PROFILEID'];
@@ -264,15 +280,13 @@ class PaymentController extends Controller
                 // save the invoice
                 try {
                     DB::beginTransaction();
-                    $invoice->user_id = $user->id;
-                    $invoie->trial_status = 0;
+                    //dd($invoice);
                     $invoice->active = 1;
-                    $invoice->amount = $amount_to_pay;
                     $invoice->payment_method = 'PayPal';
-                    $invoice->payment_date = Carbon::now();
-                    $invoice->created_at = Carbon::now();
+                    $invoice->current_date = Carbon::now();
+                    $invoice->updated_at = Carbon::now();
                     $invoice->expiration_date = Carbon::now()->addMonths(1);
-                    $invoice->save();
+                    $invoice->update();
                 }
                 catch(\Illuminate\Database\QueryException $ex){
                     DB::rollback();
@@ -289,10 +303,10 @@ class PaymentController extends Controller
                     // App\Invoice has a active attribute that returns true or false based on payment status
                     // so if active is false return with error, else return with success message
                     if ( $invoice->active == 1 ) {
-                        return redirect()->route('subscription')->with(['status' => 'success', 'message' => 'Order ' . $invoice->id . ' has been paid successfully!']);
+                        return redirect()->route('payment.index')->with(['session' => 'success', 'message' => __('Orden ') . $invoice->id . __(' ha sido pagada satisfactoriamente')]);
                     }
                 }
-                return redirect()->route('subscription')->with(['status' => 'danger', 'message' => 'Error processing PayPal payment for Order ' . $invoice->id . '!']);
+                return redirect()->route('payment.index')->with(['session' => 'error', 'message' => __('Error procesando pago de Paypal para la orden ') . $invoice->id . '!']);
             }
 
         }

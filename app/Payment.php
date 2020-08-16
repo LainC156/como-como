@@ -12,7 +12,7 @@ class Payment extends Model
 
     public $cacheFor = 3600; // cache time, in seconds
 
-    protected $fillable = ['user_id', 'trial_status', 'active', 'payment_status', 'recurring_id', 'price', 'currency_unit', 'payment_method', 'payment_date', 'expiration_date'
+    protected $fillable = ['user_id', 'trial_status', 'active', 'payment_status', 'recurring_id', 'amount', 'currency_unit', 'payment_method', 'current_date', 'expiration_date'
     ];
 
     protected $dates = [

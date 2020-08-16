@@ -20,7 +20,7 @@ class CreatePaymentsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('trial_status')->default(1);
             $table->integer('active')->default(0);
-            $table->integer('payment_status')->default(0);
+            $table->string('payment_status')->nullable();
             $table->string('recurring_id')->nullable();
             $table->float('amount')->default(0.0);
             $table->string('currency_unit')->default('MXN');
