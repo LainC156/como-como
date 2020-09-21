@@ -167,6 +167,7 @@ return [
          */
         Yajra\DataTables\DataTablesServiceProvider::class,
         Srmklive\PayPal\Providers\PayPalServiceProvider::class,
+        FruitCake\Cors\CorsServiceProvider::class,
         /*
          * Application Service Providers...
          */
