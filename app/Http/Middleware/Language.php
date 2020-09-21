@@ -18,7 +18,7 @@ class Language
     public function handle($request, Closure $next)
     {
         if( session('applocale') AND array_key_exists(session('applocale'), config('language')) ){
-            $configLanguage = config('languages')[session('applocale')];
+            $configLanguage = config('language')[session('applocale')];
             setLocale(LC_TIME, $configLanguage[1] . '.utf8');
             Carbon::setLocale(session('applocale'));
             App::setLocale(session('applocale'));
