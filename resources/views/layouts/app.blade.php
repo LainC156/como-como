@@ -15,7 +15,6 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
         <!-- Icons -->
         <link href="{{ asset('argon') }}/vendor/nucleo/css/nucleo.css" rel="stylesheet">
-        <link href="{{ asset('argon') }}/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
         <!-- flag-icon-css -->
         <link type="text/css" rel="stylesheet" href="{{ asset('css/app.css') }}">
         <!-- Argon CSS -->
