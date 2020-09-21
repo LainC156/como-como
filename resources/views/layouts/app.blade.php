@@ -10,18 +10,20 @@
 
         <title>{{ __('¿Cómo como?') }}</title>
         <!-- Favicon -->
-        <link href="{{ asset('argon') }}/img/brand/favicon1.png" rel="icon" type="image/png">
+        <link href="/argon/img/brand/favicon1.png" rel="icon" type="image/png">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
         <!-- Icons -->
-        <link href="{{ asset('argon') }}/vendor/nucleo/css/nucleo.css" rel="stylesheet">
+        <link href="/argon/vendor/nucleo/css/nucleo.css" rel="stylesheet">
+        <link href="/argon/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
         <!-- flag-icon-css -->
         <link type="text/css" rel="stylesheet" href="{{ asset('css/app.css') }}">
         <!-- Argon CSS -->
-        <link type="text/css" href="{{ asset('argon') }}/css/argon.css?v=1.0.0" rel="stylesheet">
+        <link type="text/css" href="/argon/css/argon.min.css" rel="stylesheet">
         <!-- DataTables CSS -->
-        <!--<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">-->
-        <link rel="stylesheet" href="{{ asset('js/datatables/datatables.min.css') }}">
+        <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+        <!--<link rel="stylesheet" href="/argon/vendor/datatables/css/datatables.min.css">-->
         <style>
             #input_name {
                 text-transform:capitalize !important;
@@ -48,14 +50,14 @@
             @include('layouts.footers.guest')
         @endguest
         @stack('js')
-        <script src="{{ asset('argon') }}/vendor/jquery/dist/jquery.min.js"></script>
+        <script src="/argon/vendor/jquery/dist/jquery.min.js"></script>
         <!-- DataTables JS -->
         <!--<script src="http://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>-->
-        <script src="{{ asset('js/datatables/datatables.min.js') }}"></script>
-        <script src="{{ asset('js/datatables/accent-neutralise.js') }}"></script>
+        <script src="/argon/vendor/datatables/js/datatables.min.js"></script>
+        <script src="/argon/vendor/datatables/accent-neutralise.js"></script>
 
         <!-- Bootstrap JS -->
-        <script src="{{ asset('argon') }}/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/argon/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
         <!-- Argon JS -->
         <script src="{{ asset('argon') }}/js/argon.js?v=1.0.0"></script>

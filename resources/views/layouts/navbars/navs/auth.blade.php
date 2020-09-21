@@ -19,11 +19,11 @@
             <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="media align-items-bottom">
                     @if(App::getLocale() == 'en')
-                    <img src="img/flags/us.png" alt="" >
+                    <img src="{{ asset('/img/flags/us.png') }}" alt="" >
                     @elseif(App::getLocale() == 'es')
-                    <img src="img/flags/mx.png" alt="" >
+                    <img src="{{ asset('/img/flags/mx.png') }}" alt="" >
                     @elseif(App::getLocale() == 'fr')
-                    <img src="img/flags/fr.png" alt="" >
+                    <img src="{{ asset('/img/flags/fr.png')}}" alt="" >
                     @endif
                 </div>
             </a>
@@ -32,15 +32,15 @@
                     <h6 class="text-overflow m-0">{{ __('Escoge tu idioma') }}</h6>
                 </div>
                 <a href="{{ route('set_language', ['es']) }}" class="dropdown-item">
-                    <img src="img/flags/mx.png" alt="">
+                    <img src="{{ asset('img/flags/mx.png') }}" alt="">
                     <span>{{ __('Español') }}</span>
                 </a>
                 <a href="{{ route('set_language', ['en']) }}" class="dropdown-item">
-                    <img src="img/flags/us.png" alt="">
+                    <img src="{{ asset('img/flags/us.png') }}" alt="">
                     <span>{{ __('English') }}</span>
                 </a>
                 <a href="{{ route('set_language', ['fr']) }}" class="dropdown-item">
-                    <img src="img/flags/fr.png" alt="">
+                    <img src="{{ asset('img/flags/fr.png') }}" alt="">
                     <span>{{ __('Francais') }}</span>
                 </a>
             </div>
