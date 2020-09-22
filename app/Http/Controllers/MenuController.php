@@ -1085,7 +1085,7 @@ class MenuController extends Controller
                         })
                         //->orWhere('last_name', 'like', "%{$search}%")
                         ->select('users.*', 'patients.*')
-                        ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(current_date, DATE(patients.birthdate) ))::int AS age")
                         ->get();
             $foods = DB::table('menus')
                         ->join('users', 'users.id', '=', 'menus.user_id')
@@ -1116,7 +1116,7 @@ class MenuController extends Controller
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
-                        ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(current_date, DATE(patients.birthdate) ))::int AS age")
                         ->where('menus.status', 1)
                         ->where('menus.kind_of_menu', '<>', 0)
                         //->where('menus.kind_of_menu', 2)
