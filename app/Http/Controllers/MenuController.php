@@ -1085,7 +1085,7 @@ class MenuController extends Controller
                         })
                         //->orWhere('last_name', 'like', "%{$search}%")
                         ->select('users.*', 'patients.*')
-                        ->selectRaw("EXTRACT(year FROM age TIMESTAMP patients.birthdate ) AS age")
+                        ->selectRaw("EXTRACT(year FROM age DATE(patients.birthdate) ) AS age")
                         ->get();
             $foods = DB::table('menus')
                         ->join('users', 'users.id', '=', 'menus.user_id')
