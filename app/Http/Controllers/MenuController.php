@@ -1105,7 +1105,7 @@ class MenuController extends Controller
                             'menus.id AS menu_id', 'users.id AS user_id', 'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.genre', 'p.caloric_requirement', 'p.weight', 'p.height', 'p.psychical_activity'
                             )
-                        ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
                         ->distinct()
                         ->get();
             $menusByName = DB::table('menus')
@@ -1116,7 +1116,7 @@ class MenuController extends Controller
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
-                        ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
                         ->where('menus.status', 1)
                         ->where('menus.kind_of_menu', '<>', 0)
                         //->where('menus.kind_of_menu', 2)
@@ -1143,7 +1143,7 @@ class MenuController extends Controller
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
-                        ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
                         ->get();
             return view('menus.search', ['search' => $query, 'usernames' => $usernames, 'foods' => $foods, 'menusByName' => $menusByName, 'menusByDescription' => $menusByDescription, 'role_id' => 3]);
         }
