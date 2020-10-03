@@ -76,7 +76,7 @@
                                                         <div class="row">
                                                             <div class="col-3">
                                                                 <span class="avatar avatar rounded-circle">
-                                                                        <img alt="Image placeholder" src="http://sistemaeaa.test/argon/img/theme/team-4-800x800.jpg">
+                                                                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.$u->avatar) }}">
                                                                 </span>
                                                             </div>
                                                             <div class="col-9">
@@ -144,7 +144,7 @@
                                                                         <div class="card-header">
                                                                             <h3 class="card-title text-primary">
                                                                                     <span class="avatar avatar rounded-circle">
-                                                                                        <img alt="Image placeholder" src="http://sistemaeaa.test/argon/img/theme/team-4-800x800.jpg">
+                                                                                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.$u->avatar) }}">
                                                                                     </span>
                                                                             {!! $u->name !!} {!! $u->last_name !!}</h3>
                                                                             <h6 class="text-muted">{{ __('Fecha de creación') }}: {!! $u->created_at !!}. {{ __('Última actualización') }}: {!! $u->updated_at !!}.</h6>
@@ -208,7 +208,7 @@
                                                                     <div class="row">
                                                                         <div class="col-3">
                                                                                 <span class="avatar avatar rounded-circle">
-                                                                                        <img alt="Image placeholder" src="http://sistemaeaa.test/argon/img/theme/team-4-800x800.jpg">
+                                                                                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.$u->avatar) }}">
                                                                                     </span>
                                                                         </div>
                                                                         <div class="col-9">
@@ -298,7 +298,7 @@
                                                                     <div class="row">
                                                                         <div class="col-3">
                                                                                 <span class="avatar avatar rounded-circle">
-                                                                                        <img alt="Image placeholder" src="http://sistemaeaa.test/argon/img/theme/team-4-800x800.jpg">
+                                                                                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.$u->avatar) }}">
                                                                                     </span>
                                                                         </div>
                                                                         <div class="col-9">
@@ -388,7 +388,7 @@
                                                                 <div class="row">
                                                                     <div class="col-3">
                                                                             <span class="avatar avatar rounded-circle">
-                                                                                    <img alt="Image placeholder" src="http://sistemaeaa.test/argon/img/theme/team-4-800x800.jpg">
+                                                                                    <img alt="Image placeholder" src="{{ asset('img/avatar/'.$u->avatar) }}">
                                                                                 </span>
                                                                     </div>
                                                                     <div class="col-9">

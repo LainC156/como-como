@@ -1046,7 +1046,7 @@ class MenuController extends Controller
                         ->where('menus.status', '=', '1')
                         ->where('menus.kind_of_menu', '<>', 0)
                         ->select(
-                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'menus.ideal',
+                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.avatar', 'users.last_name', 'menus.ideal',
                             'menus.id AS menu_id', 'users.id AS user_id', 'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu',
                             'p.birthdate', 'p.genre', 'p.caloric_requirement', 'p.weight', 'p.height', 'p.psychical_activity'
                             )
@@ -1060,7 +1060,7 @@ class MenuController extends Controller
                         ->join('users', 'users.id', '=', 'menus.user_id')
                         ->join('patients as p', 'p.user_id', '=', 'users.id')
                         ->select(
-                            'menus.id as menu_id', 'menus.name AS menu_name', 'menus.description', 'users.name', 'users.last_name', 'menus.id AS menu_id', 'users.id AS user_id',
+                            'menus.id as menu_id', 'menus.name AS menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
@@ -1090,7 +1090,7 @@ class MenuController extends Controller
                         ->join('users', 'users.id', '=', 'menus.user_id')
                         ->join('patients as p', 'p.user_id', '=', 'users.id')
                         ->select(
-                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'menus.id AS menu_id', 'users.id AS user_id',
+                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
@@ -1139,7 +1139,7 @@ class MenuController extends Controller
                         ->where('menus.status', '=', '1')
                         ->where('menus.kind_of_menu', '<>', 0)
                         ->select(
-                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name',
+                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar',
                             'menus.id AS menu_id', 'users.id AS user_id', 'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.genre', 'p.caloric_requirement', 'p.weight', 'p.height', 'p.psychical_activity'
                             )
@@ -1153,7 +1153,7 @@ class MenuController extends Controller
                         ->join('users', 'users.id', '=', 'menus.user_id')
                         ->join('patients as p', 'p.user_id', '=', 'users.id')
                         ->select(
-                            'menus.id as menu_id', 'menus.name AS menu_name', 'menus.description', 'users.name', 'users.last_name', 'menus.id AS menu_id', 'users.id AS user_id',
+                            'menus.id as menu_id', 'menus.name AS menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
@@ -1183,7 +1183,7 @@ class MenuController extends Controller
                         ->join('users', 'users.id', '=', 'menus.user_id')
                         ->join('patients as p', 'p.user_id', '=', 'users.id')
                         ->select(
-                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'menus.id AS menu_id', 'users.id AS user_id',
+                            'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
                             'menus.created_at', 'menus.updated_at', 'menus.kind_of_menu', 'menus.ideal',
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
