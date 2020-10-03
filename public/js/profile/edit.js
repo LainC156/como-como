@@ -600,4 +600,61 @@ $(document).ready(function() {
 
     });
 
+    /* update nutritionist name, lastname and password */
+    $("#update_nutritionist_btn").click( function() {
+        
+        let name = $("#input_name").val();
+        let last_name = $("#input_last_name").val();
+        let email = $("#input_email").val();
+        let password = $("#input_password").val();
+        let password_confirmation = $("#input_password_confirmation").val();
+        let identificator = $("#input_identificator").val();
+
+        if (!name || !last_name || !email || !validateEmail(email)) {
+            console.log('falta algún campo');
+            return;
+        }
+
+        let data = {
+            name,
+            last_name,
+            email,
+            password,
+            password_confirmation,
+            identificator
+        };
+        console.log('data', data);
+        let user_update_route = $("#update_nutritionist_route").val();
+        /* request to update nutritionist data */
+        $.ajax({
+            type: 'POST',
+            url: user_update_route,
+            data: data,
+            success: function(data) {
+                console.log('success: ', data);
+                if (data.status == 'error') {
+                    showErrorMessage(data.message);
+                    console.log('exception: ', JSON.stringify(data.exception));
+                } else if (data.status == 'success') {
+                    /* disable create_user_btn */
+                    $("#update_nutritionist_btn").attr('disabled', true);
+                    showSuccessMessage(data.message);
+                    /* reload page */
+                    // setTimeout(() => {
+                    //     location.reload();
+                    // }, 5000);
+                    
+                }
+            },
+            error: function(data) {
+                console.log('error: ', data);
+                showErrorMessage(data.message);
+                /* reload page */
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 5000);
+            }
+        });
+    });
+
 });

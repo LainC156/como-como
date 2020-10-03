@@ -125,6 +125,12 @@ class MenuController extends Controller
             return view('menus.create', ['patient' => $patient, 'menu' => $menu, 'required' => $data_validation, 'role_id' => 2]);
 
         } else if(Auth::user()->hasRole('patient')){
+            $auth = Auth::user();
+            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
+                    ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
+            if(!$user){
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Menú nuevo'));
+            }
             $menu = Menu::where('id', $menu_id)->first();
             $patient = User::where('users.id', $menu->user_id)
                         ->join('patients as p', 'p.user_id', '=', 'users.id')
@@ -180,6 +186,12 @@ class MenuController extends Controller
         if(Auth::user()->hasRole('nutritionist')) {
             return view('menus.create', ['patient' => $patient, 'required' => $data_validation, 'menu' => $menu, 'role_id' => 2]);
         } else if(Auth::user()->hasRole('patient')){
+            $auth = Auth::user();
+            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
+                    ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
+            if(!$user){
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Menú nuevo'));
+            }
             return view('menus.create', ['patient' => $patient, 'required' => $data_validation, 'menu' => $menu, 'role_id' => 3]);
         }
     }
@@ -903,6 +915,7 @@ class MenuController extends Controller
     public function empty(Request $request){
         $menu_id = $request['menu_id'];
         try {
+            DB::beginTransaction();
             DB::table('components')
             ->where('menu_id', $menu_id)
             ->delete();
@@ -963,6 +976,11 @@ class MenuController extends Controller
         if(Auth::user()->hasRole('nutritionist')){
             return view('menus.search', ['role_id' => 2]);
         } else if(Auth::user()->hasRole('patient')){
+            $user = Auth::user();
+            $userData = User::where('users.id', $user->id)->join('patients as p', 'p.user_id', '=', 'users.id')->first();
+            if($userData->nutritionist_id){
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Buscar menús'));
+            }
             return view('menus.search', ['role_id' => 3]);
         }
     }
@@ -990,8 +1008,8 @@ class MenuController extends Controller
                         ->select('users.*', 'patients.*')
                         /* postgresql */
                         ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
-                        /* mysql */
-                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                        /* mysql 
+                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")*/
                         ->get();
             $patients = DB::table('users')
                         ->join('patients', 'patients.id', '=', 'users.id')
@@ -1104,8 +1122,8 @@ class MenuController extends Controller
                         ->select('users.*', 'patients.*')
                         /* postgresql */
                         ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
-                        /* mysql */
-                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                         /* mysql 
+                        ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")*/
                         ->get();
             $foods = DB::table('menus')
                         ->join('users', 'users.id', '=', 'menus.user_id')
@@ -1126,9 +1144,9 @@ class MenuController extends Controller
                             'p.birthdate', 'p.genre', 'p.caloric_requirement', 'p.weight', 'p.height', 'p.psychical_activity'
                             )
                         /* postgresql */
-                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
-                        /* mysql */
-                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age") 
+                        /* mysql 
+                        ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")*/
                         ->distinct()
                         ->get();
             $menusByName = DB::table('menus')
@@ -1140,9 +1158,9 @@ class MenuController extends Controller
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
                         /* postgresql */
-                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
-                        /* mysql */
-                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age") 
+                        /* mysql 
+                        ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")*/
                         ->where('menus.status', 1)
                         ->where('menus.kind_of_menu', '<>', 0)
                         //->where('menus.kind_of_menu', 2)
@@ -1170,9 +1188,9 @@ class MenuController extends Controller
                             'p.birthdate', 'p.weight', 'p.height', 'p.genre', 'p.psychical_activity', 'p.caloric_requirement'
                             )
                         /* postgresql */
-                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
-                        /* mysql */
-                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")
+                        ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age") 
+                        /* mysql 
+                        ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")*/
                         ->get();
             return view('menus.search', ['search' => $query, 'usernames' => $usernames, 'foods' => $foods, 'menusByName' => $menusByName, 'menusByDescription' => $menusByDescription, 'role_id' => 3]);
         }

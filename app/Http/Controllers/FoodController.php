@@ -16,11 +16,10 @@ class FoodController extends Controller
      *
      */
     public function foodList(){
-        /* request to get all foods elements */
-        if(request()->ajax())
-        {
+        if( request()->ajax() ) {
             //$data = Food::all();
             $data = DB::table('foods')->get();
+            //dd($data);
             return DataTables::of($data)->make(true);
         }
     }

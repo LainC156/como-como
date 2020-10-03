@@ -201,6 +201,11 @@ $(document).ready(function() {
             $("#password_alert").hide();
             $("#password_success").hide();
             $("#password_mismatch").show();
+            if( !$("#input_password").val() && !$("#input_password_confirmation").val() ){
+                $("#password_alert").hide();
+                $("#password_success").hide();
+                $("#password_mismatch").hide();
+            }
         }
     });
     /* verify if password_confirmation field is no empty and has at least 8 characters */
@@ -238,6 +243,11 @@ $(document).ready(function() {
             $("#password_alert").hide();
             $("#password_mismatch").show();
             $("#password_success").hide();
+            if( !$("#input_password").val() && !$("#input_password_confirmation").val() ){
+                $("#password_alert").hide();
+                $("#password_success").hide();
+                $("#password_mismatch").hide();
+            }
         }
     });
     /*  CURP/ID validation */
@@ -544,6 +554,7 @@ $(document).ready(function() {
             let caloric_requirement = $("#input_caloric_requirement").val();
             if (!caloric_requirement || caloric_requirement <= 0) {
                 console.log('calculo personalizado: falta requerimiento calórico');
+                $("#input_caloric_requirement").focus();
                 return;
             }
             data = {
@@ -585,11 +596,10 @@ $(document).ready(function() {
                     /* disable create_user_btn */
                     $("#create_user_btn").attr('disabled', true);
                     showSuccessMessage(data.message);
-                    /* redirect to home
+                    /* reload page */
                     setTimeout(() => {
-                        $(location).attr('href', home_route);
+                        $(location).reload();
                     }, 5000);
-                    */
                 }
             },
             error: function(data) {

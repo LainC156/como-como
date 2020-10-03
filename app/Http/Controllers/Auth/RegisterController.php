@@ -163,6 +163,10 @@ class RegisterController extends Controller
             $user->email_verified_at = Carbon::now();
             $user->password = $pending_user->password;
             $user->account_type = $pending_user->account_type;
+            if($pending_user->nutritionist_id){
+                $user->subscription_status = 1;
+                $user->trial_version_status = 0;
+            }
             $user->save();
             if( $pending_user->account_type == 3) {
                 $patient = new Patient;

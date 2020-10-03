@@ -20,6 +20,6 @@ class Patient extends Model
 
     /* relation with Nutritionist */
     public function nutriologist() {
-        return $this->belongsTo(Nutriologist::class);
+        return $this->belongsTo(Nutritionist::class);
     }
 }

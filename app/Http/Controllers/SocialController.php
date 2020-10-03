@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Menu;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,12 +21,15 @@ class SocialController extends Controller
         if(Auth::user()->hasRole('nutritionist')){
             $data = DB::table('users')
                     ->select(
-                        'users.id AS user_id', 'menus.id AS menu_id','users.name AS username', 'users.last_name', 'menus.name', 'menus.times_downloaded',
+                        'users.id AS user_id', 'menus.id AS menu_id','users.name AS username', 'users.last_name', 'users.avatar', 'menus.name', 'menus.times_downloaded',
                         'menus.description', 'menus.kind_of_menu', 'menus.created_at', 'menus.ideal', 'menus.updated_at',
                         'patients.weight', 'patients.height', 'patients.genre', 'patients.psychical_activity',
                         'patients.caloric_requirement', DB::raw('COUNT(social.like) as likes')
                         )
-                    ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                    /* postgresql */
+                    ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                    /* mysql */
+                    //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
                     ->leftJoin('menus', 'menus.user_id', '=', 'users.id')
                     ->leftJoin('patients', 'patients.user_id', '=', 'users.id')
                     ->leftJoin('social', 'social.menu_id', '=', 'menus.id')
@@ -37,17 +41,26 @@ class SocialController extends Controller
 
             return view('social.index', ['activities' => $data, 'role_id' => 2]);
         } else if(Auth::user()->hasRole('patient')){
+            $user = Auth::user();
+            $userData = User::where('users.id', $user->id)->join('patients as p', 'p.user_id', '=', 'users.id')->first();
+            if($userData->nutritionist_id){
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Social'));
+            }
             $data = DB::table('users')
                     ->select(
-                        'users.id AS user_id', 'menus.id AS menu_id','users.name AS username', 'users.last_name', 'menus.name', 'menus.times_downloaded',
+                        'users.id AS user_id', 'menus.id AS menu_id','users.name AS username', 'users.last_name', 'users.avatar', 'menus.name', 'menus.times_downloaded',
                         'menus.description', 'menus.kind_of_menu', 'menus.created_at', 'menus.ideal', 'menus.updated_at',
                         'patients.weight', 'patients.height', 'patients.genre', 'patients.psychical_activity',
                         'patients.caloric_requirement', DB::raw('COUNT(social.like) as likes')
                         )
-                    ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                    /* postgresql */
+                        ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                        /* mysql */
+                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
                     ->leftJoin('menus', 'menus.user_id', '=', 'users.id')
                     ->leftJoin('patients', 'patients.user_id', '=', 'users.id')
                     ->leftJoin('social', 'social.menu_id', '=', 'menus.id')
+                    //->join('payments as p', 'p.user_id', '=', 'users.id')
                     ->where('menus.status', 1)
                     ->where('menus.kind_of_menu', '<>', 0)
                     ->groupBy('users.id', 'menus.id', 'patients.weight', 'patients.height', 'patients.birthdate', 'patients.genre', 'patients.psychical_activity', 'patients.caloric_requirement' )
@@ -90,9 +103,13 @@ class SocialController extends Controller
             $menu = Menu::where('id', $menu_id)->first();
             $patient = DB::table('users')
                     ->join('patients', 'patients.user_id', '=', 'users.id')
+                    ->join('menus', 'menus.user_id', '=', 'users.id')
                     ->where('users.id', $menu->user_id)
-                    ->select('users.*', 'patients.*')
-                    ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                    ->select('users.*', 'patients.*', 'menus.ideal')
+                    /* postgresql */
+                        ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                        /* mysql */
+                        //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
                     ->first();
             $validation = DB::table('social')
                                 ->where('owner_id', $patient->id)
@@ -119,18 +136,27 @@ class SocialController extends Controller
                         ->join('menus', 'menus.id', '=', 'social.menu_id')
                         ->where('social.owner_id', $patient->id)
                         ->where('social.menu_id', $menu_id)
-                        ->select('users.name', 'users.avatar', 'social.updated_at', 'social_comments.comment' )
+                        ->select('users.name', 'users.last_name', 'users.avatar', 'social.updated_at', 'social_comments.comment' )
                         //->groupBy('users.name', 'social.updated_at', 'social_comments.comment')
                         ->get();
 
             return view('social.show', ['patient' => $patient, 'menu' => $menu, 'like_validation' => $like_validation, 'activities' => $activities, 'like_count' => $like_count, 'comment_count' => $comment_count, 'role_id' => 2]);
         } else if(Auth::user()->hasRole('patient')){
+            $user = Auth::user();
+            $userData = User::where('users.id', $user->id)->join('patients as p', 'p.user_id', '=', 'users.id')->first();
+            if($userData->nutritionist_id){
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Social'));
+            }
             $menu = Menu::where('id', $menu_id)->first();
             $patient = DB::table('users')
                     ->join('patients', 'patients.user_id', '=', 'users.id')
+                    ->join('menus', 'menus.user_id', '=', 'users.id')
                     ->where('users.id', $menu->user_id)
-                    ->select('users.*', 'patients.*')
-                    ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
+                    ->select('users.*', 'patients.*', 'menus.ideal')
+                    /* postgresql */
+                    ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
+                    /* mysql */
+                    //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
                     ->first();
             $validation = DB::table('social')
                                 ->where('owner_id', $patient->id)
@@ -157,7 +183,7 @@ class SocialController extends Controller
                         ->join('menus', 'menus.id', '=', 'social.menu_id')
                         ->where('social.owner_id', $patient->id)
                         ->where('social.menu_id', $menu_id)
-                        ->select('users.name', 'users.avatar', 'social.updated_at', 'social_comments.comment' )
+                        ->select('users.name', 'users.last_name', 'users.avatar', 'social.updated_at', 'social_comments.comment' )
                         //->groupBy('users.name', 'social.updated_at', 'social_comments.comment')
                         ->get();
             return view('social.show', ['patient' => $patient, 'menu' => $menu, 'like_validation' => $like_validation, 'activities' => $activities, 'like_count' => $like_count, 'comment_count' => $comment_count, 'role_id' => 3]);

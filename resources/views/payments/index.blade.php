@@ -31,66 +31,76 @@
                     <!-- search input -->
                     <div class="container">
                         @if( $user->trial_status == 1)
-                            <h2 class="display-2 text-primary text-center"><i class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
+                            <h3 class="display-2 text-primary text-center"><i class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
                             <h4 class="display-4 text-success text-center">{{ __('Este es tu mes de prueba gratis') }}</h4>
                         @elseif( $user->active == 1 )
-                            <h2 class="display-2 text-primary text-center"><i class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
-                            <form class="form text-center" role="form">
+                            <h3 class="display-2 text-primary text-center"><i class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
+                            <div class="row text-center">
                                 @if( $role_id == 2)
                                 <div class="col-auto">
                                     <div class="form-group">
                                         <label for="patients" class="form-control-label">{{ __('Total de pacientes') }}:</label>
-                                        <input type="number" class="form-control" id="patients" value="{!! $total_patients !!}" disabled>
+                                        <input type="number" class="form-control text-center" id="patients" value="{!! $total_patients !!}" disabled>
                                     </div>
                                 </div>
                                 @endif
                                 <div class="col-auto">
                                     <div class="form-group">
                                         <label for="amount" class="form-control-label">{{ __('Monto') }}:</label>
-                                        <input type="number" class="form-control" id="amount" value="{!! $amount_to_pay !!}" disabled>
+                                        <input type="number" class="form-control text-center" id="amount" value="{!! $amount_to_pay !!}" disabled>
                                     </div>
                                 </div>
                                 <div class="col-auto">
                                     <div class="form-group">
                                         <label for="currency_unit" class="form-control-label">{{ __('Unidad de cambio') }}:</label>
-                                        <input id="currency_unit" type="text" value="{!! $user->currency_unit !!}" class="form-control" disabled />
+                                        <input id="currency_unit" type="text" value="{!! $user->currency_unit !!}" class="form-control text-center" disabled />
                                     </div>
                                 </div>
                                 <div class="col-auto">
                                     <div class="form-group">
                                         <label for="payment_date" class="form-control-label">{{ __('Fecha de pago') }}:</label>
-                                        <input id="payment_date" type="text" value="{!! $user->current_date !!}" class="form-control" disabled />
+                                        <input id="payment_date" type="text" value="{!! $user->current_date !!}" class="form-control text-center" disabled />
                                     </div>
                                 </div>
                                 <div class="col-auto">
                                     <div class="form-group">
                                         <label for="expiration_date" class="form-control-label">{{ __('Fecha de vencimiento') }}:</label>
-                                        <input id="expiration_date" type="text" value="{!! $user->expiration_date !!}" class="form-control" disabled />
+                                        <input id="expiration_date" type="text" value="{!! $user->expiration_date !!}" class="form-control text-center" disabled />
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         @elseif( $user->trial_status == 0 && $user->active == 0 )
-                            <h2 class="display-2 text-warning text-center">{{ __('Tu cuenta está inactiva, para poder activar tu cuenta es necesario que realices el pago correspondiente.') }}</h2>
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <label for="expiration_date" class="form-control-label">{{ __('Fecha de vencimiento') }}:</label>
-                                    <input id="expiration_date" type="text" value="{!! $user->expiration_date !!}" class="form-control" disabled />
+                            <h3 class="display-4 text-warning text-center">{{ __('Tu cuenta está inactiva, para poder activar tu cuenta es necesario que realices el pago correspondiente.') }}</h3>
+                            <div class="row text-center">
+                                <div class="col-auto">
+                                    <div class="form-group">
+                                        <label for="expiration_date" class="form-control-label">{{ __('Fecha de vencimiento') }}:</label>
+                                        <input id="expiration_date" type="text" value="{!! $user->expiration_date !!}" class="form-control text-center" disabled />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <label for="patients" class="form-control-label">{{ __('Total de pacientes') }}:</label>
-                                    <input id="patients" type="text" value="{!! $total_patients !!}" class="form-control" disabled />
+                                @if($role_id==2)
+                                <div class="col-auto">
+                                    <div class="form-group">
+                                        <label for="patients" class="form-control-label">{{ __('Total de pacientes') }}:</label>
+                                        <input id="patients" type="text" value="{!! $total_patients !!}" class="form-control text-center" disabled />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <label for="amount" class="form-control-label">{{ __('Monto a pagar') }}:</label>
-                                    <input type="number" class="form-control" id="amount" value="{!! $amount_to_pay !!}" disabled>
+                                @endif
+                                <div class="col-auto">
+                                    <div class="form-group">
+                                        <label for="amount" class="form-control-label">{{ __('Monto a pagar') }}:</label>
+                                        <input type="number" class="form-control text-center" id="amount" value="{!! $amount_to_pay !!}" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-group">
+                                        <label for="currency_unit" class="form-control-label">{{ __('Unidad de cambio') }}:</label>
+                                        <input id="currency_unit" type="text" value="{!! $user->currency_unit !!}" class="form-control text-center" disabled />
+                                    </div>
                                 </div>
                             </div>
                             <div class="display-3">
-                                <h2 class="text-primary">{{ __('Métodos de pago') }}</h2>
+                                <h2 class="text-primary text-center">{{ __('Métodos de pago') }}</h2>
                             </div>
                             <div class="nav-wrapper">
                                 <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="tabs-icons-text" role="tablist">
@@ -107,7 +117,7 @@
 
                                                 <table border="0" cellpadding="10" cellspacing="0" align="center"><tr><td align="center"></td></tr><tr><td align="center"><a href="https://www.paypal.com/in/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/in/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700'); return false;"><img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-200px.png" border="0" alt="PayPal Logo"></a></td></tr></table>
 
-                                                <a href="{{ route('paypal.express-checkout') }}" class="btn btn-success">{{ __('Pagar desde Paypal') }}</a>
+                                                <a href="{{ route('paypal.payment') }}" class="btn btn-success">{{ __('Pagar desde Paypal') }}</a>
 
                                             </div>
                                         </div>

@@ -10,6 +10,7 @@
     <div class="container-fluid mt--7">
         <input type="hidden" id="user_id" value="{{ $user->id }}">
         <input id="user_update_route" type="hidden" value="{{ route('user.update') }}">
+        <input id="update_nutritionist_route" type="hidden" value="{{ route('profile.update') }}">
         <input id="home_route" type="hidden" value="{{ route('home') }}">
         <input type="hidden" id="update_avatar_route" value="{{ route('avatar.update',$user->id) }}">
         <div class="row">
@@ -29,7 +30,7 @@
                         </div>
                     </div>
                     <div class="card-body pt-0 pt-md-4">
-                        @if($role_id == 3)
+                        @if($role_id == 3 || $role_id == 2)
                         <div class="row">
                             <div class="col">
                                 @include('helpers.alerts')
@@ -111,7 +112,7 @@
                         @endif
                         @if($role_id == 2)
                         <div class="row">
-                            <div class="col">
+                            <div class="col lx-12">
                                 <div class="card-profile-stats d-flex justify-content-center mt-md-5">
                                     <div>
                                         <span class="heading">22</span>
@@ -125,6 +126,11 @@
                                         <span class="heading">89</span>
                                         <span class="description">{{ __('Comments') }}</span>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card-footer">
+                                    <button class="btn btn-success btn-block" id="update_nutritionist_btn"><i class="ni ni-fat-add"></i>{{ __('Actualizar perfil') }}</button>
                                 </div>
                             </div>
                         </div>

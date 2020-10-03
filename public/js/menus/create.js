@@ -7,7 +7,9 @@
         let component_id = 0;
         let patient_id = $("#patient_id").val();
         let url = $("#list_menu").val();
+        let food_data = $("#list_food").val();
         console.log('url: ', url);
+        console.log('data: ', food_data);
         //let url_menu_table_data = $("#kind_of_menu").val() == 0 ? url : $("#edit_saved_menu").val();
         let food_name_validation = 0;
         let food_amount = 0;
@@ -30,7 +32,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: $("#list_food").val(),
+                url: food_data,
                 type: 'GET',
             },
             columns: [

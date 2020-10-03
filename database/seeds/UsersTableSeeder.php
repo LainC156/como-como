@@ -38,11 +38,12 @@ class UsersTableSeeder extends Seeder
         $patient->save();
         $user->roles()->attach($patient_role);
         $user->update();
+        /* no need in patients with nutritionist
         $user_payment = new Payment();
         $user_payment->user_id = $user->id;
         $user_payment->save();
         $user_payment->user()->associate($user->id);
-        $user_payment->update();
+        $user_payment->update(); */
         /* first nutritionist */
         $user = new User();
         $user->name = 'María del Pilar';

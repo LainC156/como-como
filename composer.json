@@ -15,8 +15,8 @@
         "laravel/framework": "^6.2",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^1.2",
+        "paypal/rest-api-sdk-php": "^1.14",
         "rennokki/laravel-eloquent-query-cache": "^2.0",
-        "srmklive/paypal": "^1.7",
         "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {

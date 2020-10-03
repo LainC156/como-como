@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Patient;
 use App\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;

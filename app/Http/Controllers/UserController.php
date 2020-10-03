@@ -63,7 +63,6 @@ class UserController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request) {
-        if( Auth::user() ) {
                 $name = $request['name'];
                 $last_name = $request['last_name'];
                 $identificator = $request['identificator'];
@@ -121,14 +120,15 @@ class UserController extends Controller
                 }catch(\Illuminate\Database\QueryException $ex){
                     DB::rollback();
                     $message = __('Ocurrió un error, vuelve a intentarlo');
+                    dd($ex);
                     return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
                 }
                 catch(\Exception $ex){
                     DB::rollback();
                     $message = __('Ocurrió un error, vuelve a intentarlo');
+                    dd($ex);
                     return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
                 }
-        }
     }
 
     /**
@@ -158,7 +158,7 @@ class UserController extends Controller
     public function update(Request $request)
     {
         if(Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')){
-            $patient_id = $request['user_id'];
+            $patient_id = $request['patient_id'];
             $name = $request['name'];
             $last_name = $request['last_name'];
             $identificator = $request['identificator'];
@@ -219,6 +219,7 @@ class UserController extends Controller
             catch(\Exception $ex){
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo');
+                //dd($ex);
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
             }
         }

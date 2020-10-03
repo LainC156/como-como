@@ -21,9 +21,9 @@
         <link type="text/css" rel="stylesheet" href="{{ asset('css/app.css') }}">
         <!-- Argon CSS -->
         <link type="text/css" href="/argon/css/argon.min.css" rel="stylesheet">
-        <!-- DataTables CSS -->
-        <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
-        <!--<link rel="stylesheet" href="/argon/vendor/datatables/css/datatables.min.css">-->
+        <!-- DataTables CSS 
+        <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">-->
+        <link rel="stylesheet" href="/argon/vendor/datatables/css/datatables.min.css">
         <style>
             #input_name {
                 text-transform:capitalize !important;
@@ -54,7 +54,7 @@
         <!-- DataTables JS -->
         <!--<script src="http://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>-->
         <script src="/argon/vendor/datatables/js/datatables.min.js"></script>
-        <script src="/argon/vendor/datatables/accent-neutralise.js"></script>
+        <!--<script src="/argon/vendor/datatables/accent-neutralise.js"></script>-->
 
         <!-- Bootstrap JS -->
         <script src="/argon/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

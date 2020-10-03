@@ -34,9 +34,10 @@ class HomeController extends Controller
         }else if( Auth::user()->hasRole('patient')) {
             $user = Auth::user();
             $user_data = User::where('users.id', $user->id)
-                    ->join('payments as p','p.id', '=', 'users.id')
+                    ->leftJoin('payments as p','p.user_id', '=', 'users.id')
+                    ->orderBy('p.id', 'desc')
                     ->first();
-            //dd($user);
+            //dd($user_data);
             $menus = Menu::where('user_id', $user->id)->count();
             return view('dashboard', ['role_id' => 3, 'menus' => $menus, 'user' => $user_data]);
         }else if( Auth::user()->hasRole('admin')) {

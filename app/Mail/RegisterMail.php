@@ -31,6 +31,7 @@ class RegisterMail extends Mailable
     {
         return $this->from('comocomo@mail.com')
             ->view('emails.register')
+            ->subject(__('Correo de activación'))
             ->with(
             [
                 'token' => $this->register->token
