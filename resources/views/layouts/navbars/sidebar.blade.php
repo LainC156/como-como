@@ -15,7 +15,7 @@
                 <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="media align-items-center">
                         <span class="avatar avatar-sm rounded-circle">
-                        <img alt="Image placeholder" src="{{ asset('/img/avatar/'.auth()->user()->avatar) }}">
+                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.auth()->user()->avatar) }}">
                         </span>
                     </div>
                 </a>
@@ -57,10 +57,11 @@
                 <div class="row">
                     <div class="col-6 collapse-brand">
                         <a href="{{ route('home') }}">
-                            <img src="{{ asset('argon') }}/img/brand/blue.png">
+                            <img src="{{ asset('argon') }}/img/brand/favicon1.png">
                         </a>
                     </div>
                     <div class="col-6 collapse-close">
+                        <span class="text-primary">{{ __('¿Cómo como?') }}</span>
                         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#sidenav-collapse-main" aria-controls="sidenav-main" aria-expanded="false" aria-label="Toggle sidenav">
                             <span></span>
                             <span></span>
