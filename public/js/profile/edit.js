@@ -587,11 +587,10 @@ $(document).ready(function() {
                     /* disable create_user_btn */
                     $("#create_user_btn").attr('disabled', true);
                     showSuccessMessage(data.message);
-                    /* redirect to home
+                    /* reload page */
                     setTimeout(() => {
-                        $(location).attr('href', home_route);
+                        $(location).reload();
                     }, 5000);
-                    */
                 }
             },
             error: function(data) {
