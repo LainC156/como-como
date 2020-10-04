@@ -524,6 +524,7 @@ $(document).ready(function() {
             }
             data = {
                 user_id,
+                patient_id: user_id,
                 name,
                 last_name,
                 email,
@@ -548,6 +549,7 @@ $(document).ready(function() {
             }
             data = {
                 user_id,
+                patient_id: user_id,
                 name,
                 last_name,
                 identificator,
