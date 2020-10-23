@@ -1012,7 +1012,7 @@ class MenuController extends Controller
                         //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")*/
                         ->get();
             $patients = DB::table('users')
-                        ->join('patients', 'patients.id', '=', 'users.id')
+                        ->join('patients', 'patients.user_id', '=', 'users.id')
                         ->where('patients.nutritionist_id', $nutritionist->id)
                         ->where(function($q) use ($search) {
                             foreach($search as $s){

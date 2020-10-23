@@ -25,15 +25,16 @@ class UserController extends Controller
     public function index(User $model)
     {
         if( Auth::user()->hasRole('nutritionist')) {
-            $auth = Auth::user();
+            //$auth = Auth::user();
 
-            $user=  User::where('users.id', $auth->id)
+            $user=  User::where('users.id', auth()->id())
                     ->join('payments as p','p.user_id', '=', 'users.id')
                     ->first();
             //dd($user);
-            $patients = Patient::where('nutritionist_id', $user->id)
-                        ->join('users as u', 'u.id', 'patients.user_id')
+            $patients = Patient::where('nutritionist_id', auth()->id())
+                        ->join('users as u', 'u.id', '=', 'patients.user_id')
                         ->get();
+            //dd($patients);
             $role_id = 2;
         }
         return view('users.index', ['user' => $user,'patients' => $patients, 'role_id' => $role_id]);
