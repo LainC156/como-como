@@ -9,9 +9,6 @@
             <div class="col-lg-6 col-md-8">
                 <div class="card bg-secondary shadow border-0">
                     <div class="card-body px-lg-5 py-lg-5">
-                        <div class="text-center text-muted mb-4">
-                            <small class="text-red">{{ __('Todos los campos son obligatorios, excepto CURP/ID') }}</small>
-                        </div>
                         <!-- NAME -->
                         <div class="form-group">
                             <div class="input-group input-group-alternative mb-3">
@@ -66,8 +63,8 @@
                                 <input class="form-control" placeholder="{{ __('Confirma contraseña') }}" type="password" name="password_confirmation" id="registration_password_confirmation">
                             </div>
                         </div>
-                        <div class="text-muted font-italic">
-                            <small class="text-success font-weight-700">{{ __('La contraseña debe de ser de al menos 8 caracteres') }}</small>
+                        <div class="text-center text-muted font-italic">
+                            <small class="text-success">{{ __('La contraseña debe de ser de al menos 8 caracteres') }}</small>
                         </div>
                         <!-- kind of subscription -->
                         <div class="form-group text-center">
@@ -91,6 +88,9 @@
                         -->
                         @include('helpers.alerts')
                         <div class="text-center">
+                            <div class="text-center text-muted">
+                                <small id="empty_inputs_alert" class="text-red">{{ __('Todos los campos son obligatorios, excepto CURP/ID') }}</small>
+                            </div>
                             <button type="submit" id="register_btn" class="btn btn-primary mt-4">{{ __('Crear cuenta') }}</button>
                         </div>
                     </div>

@@ -4,18 +4,17 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\RegisterMail as RegisterMail;
-use App\Providers\RouteServiceProvider;
-use App\User;
 use App\Nutritionist;
 use App\Patient;
+use App\Providers\RouteServiceProvider;
 use App\Role as Role;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -28,7 +27,7 @@ class RegisterController extends Controller
     | validation and creation. By default this controller uses a trait to
     | provide this functionality without requiring any additional code.
     |
-    */
+     */
 
     use RegistersUsers;
 
@@ -70,8 +69,9 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\User
      */
-    protected function register(Request $request) {
-        if( request()-> ajax() ){
+    protected function register(Request $request)
+    {
+        if (request()->ajax()) {
             $message = '';
             $name = $request['name'];
             $last_name = $request['last_name'];
@@ -81,21 +81,37 @@ class RegisterController extends Controller
             $password_confirmation = $request['password_confirmation'];
             $account_type = $request['account_type'];
 
-            /* validations */
-            if(User::where('email', $email)->exists()) {
+            /* email */
+            if (User::where('email', $email)->exists()) {
                 $message = __('El correo proporcionado ya está en nuestros registros');
                 return response()->json(['status' => 'error', 'message' => $message]);
             }
-            if(  $id && User::where('identificator', $id)->exists()) {
+            /* curp */
+            if ($id && User::where('identificator', $id)->exists()) {
                 $message = __('CURP/ID proporcionada ya está en nuestros registros');
                 return response()->json(['status' => 'error', 'message' => $message]);
             }
-            if( strlen($password) <= 7) {
+            /* password and password confirmation */
+            if (strlen($password) <= 7) {
                 $message = __('La contraseña debe tener al menos 8 caracteres');
                 return response()->json(['status' => 'error', 'message' => $message]);
             }
-            if( $password != $password_confirmation) {
+            if (strlen($password_confirmation) <= 7) {
+                $message = __('La confirmación de contraseña debe tener al menos 8 caracteres');
+                return response()->json(['status' => 'error', 'message' => $message]);
+            }
+            if ($password !== $password_confirmation) {
                 $message = __('Las contraseñas no coinciden, verifica tu información');
+                return response()->json(['status' => 'error', 'message' => $message]);
+            }
+            /* name */
+            if (strlen($name) === '') {
+                $message = __('El campo nombre es requerido');
+                return response()->json(['status' => 'error', 'message' => $message]);
+            }
+            /* last name */
+            if (strlen($last_name) === '') {
+                $message = __('El campo apellidos es requerido');
                 return response()->json(['status' => 'error', 'message' => $message]);
             }
             /* token to activate account */
@@ -115,20 +131,19 @@ class RegisterController extends Controller
                 /* email to activate account */
                 $registerObj = new \StdClass();
                 $registerObj->token = $token;
-                $registerObj->name = $name." ".$last_name;
+                $registerObj->name = $name . " " . $last_name;
                 $registerObj->password = $password;
                 Mail::to($email)->send(new RegisterMail($registerObj));
                 DB::commit();
                 $message = __('Cuenta creada correctamente, verifica tu cuenta de correo para activar tu cuenta');
                 return response()->json(['status' => 'success', 'message' => $message]);
-            }catch(\Illuminate\Database\QueryException $ex){
+            } catch (\Illuminate\Database\QueryException $ex) {
                 DB::rollback();
-                $message = __('Ocurrió un error, vuelve a intentarlo');
+                $message = __('Ocurrió un error, vuelve a intentarlo recargando la página');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
-            }
-            catch(\Exception $ex){
+            } catch (\Exception $ex) {
                 DB::rollback();
-                $message = __('Ocurrió un error, vuelve a intentarlo');
+                $message = __('Ocurrió un error, vuelve a intentarlo recargando la página');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
             }
         }
@@ -140,13 +155,13 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\User
      */
-    protected function confirmRegister($token){
+    protected function confirmRegister($token) {
         $pending_user = DB::table('pending_users')
-        ->where('token', $token)
-        ->where('status', 0)
-        ->first();
+            ->where('token', $token)
+            ->where('status', 0)
+            ->first();
 
-        if(!$pending_user) {
+        if (!$pending_user) {
             return redirect()->route('login')->with('error', __('Esta cuenta ya ha sido activada anteriormente'));
         }
         $patient_role = Role::findOrFail(3);
@@ -163,12 +178,12 @@ class RegisterController extends Controller
             $user->email_verified_at = Carbon::now();
             $user->password = $pending_user->password;
             $user->account_type = $pending_user->account_type;
-            if($pending_user->nutritionist_id){
+            if ($pending_user->nutritionist_id) {
                 $user->subscription_status = 1;
                 $user->trial_version_status = 0;
             }
             $user->save();
-            if( $pending_user->account_type == 3) {
+            if ($pending_user->account_type == 3) {
                 $patient = new Patient;
                 $patient->id = $user->id;
                 $patient->user_id = $user->id;
@@ -186,7 +201,7 @@ class RegisterController extends Controller
                 $user->roles()->attach($patient_role);
                 $user->update();
             }
-            if( $pending_user->account_type == 2 ){
+            if ($pending_user->account_type == 2) {
                 $nutritionist = new Nutritionist;
                 $nutritionist->id = $user->id;
                 $nutritionist->user_id = $user->id;
@@ -196,20 +211,19 @@ class RegisterController extends Controller
             }
             /* updating info un pending_users table status = true (activated account) */
             DB::table('pending_users')
-            ->where('token', '=', $pending_user->token)
-            ->update( ['status' => true,
-                        'email_verified_at' => Carbon::now()
-            ]);
+                ->where('token', '=', $pending_user->token)
+                ->update(['status' => true,
+                    'email_verified_at' => Carbon::now(),
+                ]);
 
             DB::commit();
 
             return redirect()->route('login')->with('success', __('Cuenta activada correctamente'));
 
-        }catch(\Illuminate\Database\QueryException $ex){
+        } catch (\Illuminate\Database\QueryException $ex) {
             DB::rollback();
-            return redirect()->route('login')->with('error', __('Ocurrió un error, vuelve a intentarlo1'));
-        }
-        catch(\Exception $ex){
+            return redirect()->route('login')->with('error', __('Ocurrió un error, vuelve a intentarlo'));
+        } catch (\Exception $ex) {
             DB::rollback();
             return redirect()->route('login')->with('error', __('Ocurrió un error, vuelve a intentarlo'));
         }
