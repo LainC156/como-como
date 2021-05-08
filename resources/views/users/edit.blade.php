@@ -37,7 +37,7 @@
                                                         <div class="col">
                                                             <img class="responsive text-center"
                                                                 style="vertical-align: middle;width: 150px;height: 150px;border-radius: 50%;"
-                                                                src="{{ asset('img/avatar/user.jpg') }}" alt="no_img">
+                                                                src="{{ asset('img/avatar/' . $patient->avatar) }}" alt="no_img">
                                                         </div>
                                                         <div class="col">
                                                             <div class="col mt-auto">
