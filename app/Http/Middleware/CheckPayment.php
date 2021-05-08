@@ -22,7 +22,7 @@ class CheckPayment
         $user = $request->user();
         if ($user->hasRole('patient') || $user->hasRole('nutritionist')) {
             /* check if trial status is not valid */
-            if ($user->trial_version_status == 1 && !Carbon::parse($user->created_at)->lessThan(Carbon::now())) {
+            if ($user->trial_version_status === true && !Carbon::parse($user->created_at)->lessThan(Carbon::now())) {
                 try {
                     DB::beginTransaction();
                     $user->trial_version_status = 0;
@@ -45,7 +45,7 @@ class CheckPayment
                 ->join('payments as p', 'p.user_id', '=', 'users.id')
                 //->select('p.trial_status', 'p.active', 'p.id', 'users.id as user_id', 'p.expiration_date')
                 ->orderBy('p.id', 'desc')->first();
-            if ($user->subscription_status == 1 && !Carbon::parse($data->expiration_date)->lessThan(Carbon::now())) {
+            if ($user->subscription_status === true && !Carbon::parse($data->expiration_date)->lessThan(Carbon::now())) {
                 /* check if user has role patient */
                 /* check if patient was not created by some nutritionist(patients created by nutritionist has no check payment middleware) */
                 $patient = User::where('users.id', $user->id)
