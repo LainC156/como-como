@@ -35,7 +35,7 @@
                                         class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
                                     <h4 class="display-4 text-success text-center">
                                         {{ __('Este es tu mes de prueba gratis') }}</h4>
-                                @elseif( $user->subscription_status === true )
+                                @elseif( $user->subscription_status === true && $user->trial_version_status === false)
                                     <h3 class="display-2 text-primary text-center"><i
                                             class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
                                         <div class="row text-center">
