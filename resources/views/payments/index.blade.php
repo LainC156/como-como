@@ -37,7 +37,8 @@
                                         {{ __('Este es tu mes de prueba gratis') }}</h4>
                                 @elseif( $user->subscription_status === true && $user->trial_version_status === false)
                                     <h3 class="display-2 text-primary text-center"><i
-                                            class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h2>
+                                            class="ni ni-check-bold"></i>{{ __('Cuenta activa') }}.</h3>
+                                            {!! $user->id !!}
                                         <div class="row text-center">
                                             @if ($role_id == 2)
                                                 <div class="col-auto">
