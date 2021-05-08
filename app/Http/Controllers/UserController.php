@@ -144,6 +144,9 @@ class UserController extends Controller
             $patient = User::where('users.id', $id)
                         ->join('patients as p', 'p.user_id', '=', 'users.id')
                         ->first();
+                        if(!$patient) {
+                            abort(404);
+                        }
             $role_id = 2;
             return view('users.edit', ['patient' => $patient, 'role_id' => $role_id]);
         }
@@ -211,7 +214,7 @@ class UserController extends Controller
                     'wrist_size' => $wrist_size
                 ]);
                 DB::commit();
-                return response()->json(['status' => 'success', 'message' => __('Datos actualizados correctamente')]);
+                return response()->json(['status' => 'success', 'message' => __('Datos actualizados correctamente, la página se actualizará automáticamente')]);
             }catch(\Illuminate\Database\QueryException $ex){
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo');
@@ -286,7 +289,6 @@ class UserController extends Controller
             catch(\Exception $ex){
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo2');
-                dd($ex);
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
             }
 

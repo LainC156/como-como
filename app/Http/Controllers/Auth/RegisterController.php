@@ -150,12 +150,13 @@ class RegisterController extends Controller
     }
     /**
      * Create a new user instance after a valid activation.
-     * account_type: 0 = patient, 1 = nutriologist
+     * account_type: 3 = patient, 2 = nutritionist
      *
      * @param  array  $data
      * @return \App\User
      */
-    protected function confirmRegister($token) {
+    protected function confirmRegister($token)
+    {
         $pending_user = DB::table('pending_users')
             ->where('token', $token)
             ->where('status', 0)
@@ -168,7 +169,6 @@ class RegisterController extends Controller
         $nutritionist_role = Role::findOrFail(2);
         $message = '';
         try {
-            /* cases: nutritionist or patient without a nutritionist */
             DB::beginTransaction();
             $user = new User;
             $user->name = $pending_user->name;
@@ -178,11 +178,13 @@ class RegisterController extends Controller
             $user->email_verified_at = Carbon::now();
             $user->password = $pending_user->password;
             $user->account_type = $pending_user->account_type;
+            /* patient created by nutritionist */
             if ($pending_user->nutritionist_id) {
                 $user->subscription_status = 1;
                 $user->trial_version_status = 0;
             }
             $user->save();
+            /* create relation user-patient */
             if ($pending_user->account_type == 3) {
                 $patient = new Patient;
                 $patient->id = $user->id;
@@ -201,6 +203,7 @@ class RegisterController extends Controller
                 $user->roles()->attach($patient_role);
                 $user->update();
             }
+            /* create relation user-nutritionist */
             if ($pending_user->account_type == 2) {
                 $nutritionist = new Nutritionist;
                 $nutritionist->id = $user->id;

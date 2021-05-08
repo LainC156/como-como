@@ -24,16 +24,8 @@
         <!-- DataTables CSS 
         <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">-->
         <link rel="stylesheet" href="/argon/vendor/datatables/css/datatables.min.css">
-        <style>
-            #input_name {
-                text-transform:capitalize !important;
-            }
-            #input_last_name{
-                text-transform:capitalize !important;
-            }
-        </style>
     </head>
-    <body class="{{ $class ?? '' }}">
+    <body id="body_tag" class="{{ $class ?? '' }}">
         @auth()
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf

@@ -9,7 +9,6 @@ class CreatePendingUsersTable extends Migration
     /**
      * Run the migrations.
      * status: 0 = not activated, 1 = activated
-     * account_type: 0 = patient, 1 = nutriologist
      *
      * @return void
      */
