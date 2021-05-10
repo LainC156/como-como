@@ -180,7 +180,7 @@ class PaymentController extends Controller
         if (Auth::user()->hasRole('nutritionist')) {
             $auth = Auth::user();
             $user = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
-                    ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
+                ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
             $total_patients = DB::table('patients')
                 ->where('nutritionist_id', $auth->id)->count();
             $amount_to_pay = 0;
@@ -193,17 +193,25 @@ class PaymentController extends Controller
             } else if ($total_patients > 150 && $total_patients <= 200) {
                 $amount_to_pay = $total_patients * 19;
             }
+            if ($user->trial_version_status) {
+                $user->expiration_date = Carbon::parse($user->created_at)->addMonths(1);
+            }
 
             return view('payments.index', ['user' => $user, 'role_id' => 2, 'total_patients' => $total_patients, 'amount_to_pay' => $amount_to_pay]);
         } else if (Auth::user()->hasRole('patient')) {
-            $auth = Auth::user();
-            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
-                ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
-            if (!$user) {
+            $auth = auth()->user();
+            $user = User::join('patients as p', 'p.user_id', '=', 'users.id')
+                ->where('users.id', $auth->id)->first();
+            if ($user->nutritionist_id) {
                 return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Suscripción'));
             }
+            $user_payment = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
+                ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
+            if ($user->trial_version_status) {
+                $user_payment->expiration_date = Carbon::parse($user->created_at)->addMonths(1);
+            }
             $amount_to_pay = 20;
-            return view('payments.index', ['user' => $user, 'role_id' => 3, 'amount_to_pay' => $amount_to_pay]);
+            return view('payments.index', ['user' => $user_payment, 'role_id' => 3, 'amount_to_pay' => $amount_to_pay]);
         }
     }
 

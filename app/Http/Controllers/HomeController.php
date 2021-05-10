@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Menu;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -25,27 +26,36 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if( Auth::user()->hasRole('nutritionist')) {
+        if (Auth::user()->hasRole('nutritionist')) {
             $user = Auth::user();
-            if($user->trial_version_status) {
+            if ($user->trial_version_status) {
+                $user->expiration_date = Carbon::parse($user->createdAt)->addMonths(1);
                 return view('dashboard', ['role_id' => 2, 'user' => $user]);
             }
-            if(!$user->trial_version_status && $user->subscription_status) {
+            if (!$user->trial_version_status && $user->subscription_status) {
                 $user_data = User::where('users.id', $user->id)
-                    ->join('payments as p','p.user_id', '=', 'users.id')
+                    ->join('payments as p', 'p.user_id', '=', 'users.id')
                     ->first();
+                dd($user_data);
                 return view('dashboard', ['role_id' => 2, 'user' => $user_data]);
             }
 
-        } else if( Auth::user()->hasRole('patient')) {
-            $user = Auth::user();
-            $user_data = User::where('users.id', $user->id)
-                    ->leftJoin('payments as p','p.user_id', '=', 'users.id')
+        } else if (Auth::user()->hasRole('patient')) {
+            $user = auth()->user();
+            $menus = Menu::where('user_id', $user->id)->count();
+            if ($user->trial_version_status) {
+                $user->expiration_date = Carbon::parse($user->createdAt)->addMonths(1);
+                return view('dashboard', ['role_id' => 3, 'menus' => $menus, 'user' => $user]);
+            }
+            if (!$user->trial_version_status && $user->subscription_status) {
+                $user_data = User::where('users.id', $user->id)
+                    ->leftJoin('payments as p', 'p.user_id', '=', 'users.id')
+                    ->join('patients as pa', 'pa.user_id', '=', 'users.id')
                     ->orderBy('p.id', 'desc')
                     ->first();
-            $menus = Menu::where('user_id', $user->id)->count();
-            return view('dashboard', ['role_id' => 3, 'menus' => $menus, 'user' => $user_data]);
-        }else if( Auth::user()->hasRole('admin')) {
+                return view('dashboard', ['role_id' => 3, 'menus' => $menus, 'user' => $user_data]);
+            }
+        } else if (Auth::user()->hasRole('admin')) {
             $role_id = 1;
         }
     }
