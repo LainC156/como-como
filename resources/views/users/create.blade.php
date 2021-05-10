@@ -133,8 +133,7 @@
                                                             <span id="genre_check" style="display:none" class="text-green"><i class="ni ni-check-bold"></i></span>
                                                             <span id="genre_error" style="display:none" class="text-red"><i class="ni ni-fat-remove"></i></span>
                                                             <select class="form-control select" name="input_genre" id="select_genre">
-                                                                <option value="-1" selected disabled>{{ __('Género') }}</option>
-                                                                <option value="0">{{ __('Hombre') }}</option>
+                                                                <option selected value="0">{{ __('Hombre') }}</option>
                                                                 <option value="1">{{ __('Mujer') }}</option>
                                                             </select>
                                                         </div>
@@ -145,9 +144,8 @@
                                                             <span id="psychical_activity_check" style="display:none" class="text-green"><i class="ni ni-check-bold"></i></span>
                                                             <span id="psychical_activity_error" style="display:none" class="text-red"><i class="ni ni-fat-remove"></i></span>
                                                             <select class="form-control select" name="input_psychical_activity" id="select_psychical_activity">
-                                                                <option value="-1" selected disabled>{{ __('Actividad física') }}</option>
                                                                 <option value="0">{{ __('Reposo') }}</option>
-                                                                <option value="1">{{ __('Ligera') }}</option>
+                                                                <option selected value="1">{{ __('Ligera') }}</option>
                                                                 <option value="2">{{ __('Moderada') }}</option>
                                                                 <option value="3">{{ __('Intensa') }}</option>
                                                             </select>

@@ -179,10 +179,11 @@ class PaymentController extends Controller
     {
         if (Auth::user()->hasRole('nutritionist')) {
             $auth = Auth::user();
-            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
+            $user = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
                     ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
             $total_patients = DB::table('patients')
                 ->where('nutritionist_id', $auth->id)->count();
+            $amount_to_pay = 0;
             if ($total_patients >= 1 && $total_patients <= 50) {
                 $amount_to_pay = $total_patients * 25;
             } else if ($total_patients > 50 && $total_patients <= 100) {

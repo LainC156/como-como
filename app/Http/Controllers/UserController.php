@@ -28,10 +28,10 @@ class UserController extends Controller
             //$auth = Auth::user();
 
             $user=  User::where('users.id', auth()->id())
-                    ->join('payments as p','p.user_id', '=', 'users.id')
+                    ->leftJoin('payments as p','p.user_id', '=', 'users.id')
                     ->first();
             //dd($user);
-            $patients = Patient::where('nutritionist_id', auth()->id())
+            $patients = Patient::where('patients.nutritionist_id', auth()->id())
                         ->join('users as u', 'u.id', '=', 'patients.user_id')
                         ->get();
             //dd($patients);
@@ -99,7 +99,7 @@ class UserController extends Controller
                         'email' => $email,
                         'password' => bcrypt($password),
                         'account_type' => 3,
-                        'nutritionist_id' => Auth::user()->id,
+                        'nutritionist_id' => auth()->id(),
                         'weight' => $weight,
                         'height' => $height,
                         'genre' => $genre,

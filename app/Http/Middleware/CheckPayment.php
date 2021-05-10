@@ -42,7 +42,7 @@ class CheckPayment
             }
             /* check if subscription status is not valid */
             $data = User::where('users.id', $user->id)
-                ->join('payments as p', 'p.user_id', '=', 'users.id')
+                ->leftJoin('payments as p', 'p.user_id', '=', 'users.id')
                 //->select('p.trial_status', 'p.active', 'p.id', 'users.id as user_id', 'p.expiration_date')
                 ->orderBy('p.id', 'desc')->first();
             if ($user->subscription_status === true && !Carbon::parse($data->expiration_date)->lessThan(Carbon::now())) {

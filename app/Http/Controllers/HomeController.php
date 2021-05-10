@@ -27,12 +27,17 @@ class HomeController extends Controller
     {
         if( Auth::user()->hasRole('nutritionist')) {
             $user = Auth::user();
-            $user_data = User::where('users.id', $user->id)
+            if($user->trial_version_status) {
+                return view('dashboard', ['role_id' => 2, 'user' => $user]);
+            }
+            if(!$user->trial_version_status && $user->subscription_status) {
+                $user_data = User::where('users.id', $user->id)
                     ->join('payments as p','p.user_id', '=', 'users.id')
                     ->first();
-            //dd($user_data);
-            return view('dashboard', ['role_id' => 2, 'user' => $user_data]);
-        }else if( Auth::user()->hasRole('patient')) {
+                return view('dashboard', ['role_id' => 2, 'user' => $user_data]);
+            }
+
+        } else if( Auth::user()->hasRole('patient')) {
             $user = Auth::user();
             $user_data = User::where('users.id', $user->id)
                     ->leftJoin('payments as p','p.user_id', '=', 'users.id')
