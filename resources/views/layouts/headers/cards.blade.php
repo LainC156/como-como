@@ -3,7 +3,7 @@
         <div class="header-body">
             <!-- Card stats -->
             <div class="row">
-                @if($user->active == 1 || $user->trial_status == 1)
+                @if($user->subscription_status == 1 || $user->trial_status == 1)
                 <div class="col-xl-3 col-lg-6">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
@@ -17,7 +17,7 @@
                                     <h5 class="card-title text-uppercase text-muted mb-0">{{ __('Estado de la cuenta') }}:</h5>
                                     @if( $user->trial_status == 1)
                                     <span class="h2 font-weight-bold mb-0">{{ __('Versión de prueba') }}</span>
-                                    @elseif( $user->active == 1)
+                                    @elseif( $user->subscription_status == 1)
                                     <span class="h2 font-weight-bold mb-0">{{ __('Suscripción mensual') }}</span>
                                     @endif
                                 </div>
