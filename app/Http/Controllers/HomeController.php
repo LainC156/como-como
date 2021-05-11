@@ -36,7 +36,6 @@ class HomeController extends Controller
                 $user_data = User::where('users.id', $user->id)
                     ->join('payments as p', 'p.user_id', '=', 'users.id')
                     ->first();
-                dd($user_data);
                 return view('dashboard', ['role_id' => 2, 'user' => $user_data]);
             }
 

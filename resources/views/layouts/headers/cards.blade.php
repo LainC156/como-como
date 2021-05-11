@@ -55,7 +55,7 @@
                                         <span class="h2 font-weight-bold mb-0">{{ __('Sin completar') }}</span>
                                     </div>
                                 </div>
-                                @if ($user->subscription_status == 1 && !$user->nutritionist_id)
+                                @if (($user->subscription_status == 1 && !$user->nutritionist_id) || ($user->trial_version_status && !$user->nutritionist_id))
                                     <p class="mt-3 mb-0 text-muted text-sm">
                                         <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i>
                                             {{ __('Es necesario completar tu perfil para poder empezar a crear menús') }}</span>
