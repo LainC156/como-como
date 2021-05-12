@@ -54,18 +54,34 @@
                                 </h5>
                             </div>
                             <div class="col-auto col-md-4">
-                                @if ($menu_validation == 1)
-                                    <a href="{{ route('menu.edit', ['id' => $menu->id]) }}" target="_blank"
-                                        class="btn btn-sm btn-info"><i class="far fa-edit"></i>
-                                        {{ __('Editar menú') }}</a>
-                                    @if ($role_id == 2)
+                                @if ($role_id === 2)
+                                    @if ($menu_validation == 1)
+                                        <!-- check if patient has nutritionist, then hide edit menu -->
+                                        <a href="{{ route('menu.edit', ['id' => $menu->id]) }}" target="_blank"
+                                            class="btn btn-sm btn-info"><i class="far fa-edit"></i>
+                                            {{ __('Editar menú') }}</a>
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
-                                            {{ __('Guardar menú') }}</a>
+                                            {{ __('Guardar una copia del menú') }} MV</a>
+                                    @else
+                                        <a data-toggle="modal" data-target="#saveMenuModal"
+                                            class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
+                                            {{ __('Guardar una copia del menú') }}NMV: {!! $patient->nutritionist_id !!}</a>
                                     @endif
-                                @else
-                                    <a data-toggle="modal" data-target="#saveMenuModal" class="btn btn-sm btn-success"><i
-                                            class="ni ni-folder-17"></i> {{ __('Guardar menú') }}</a>
+                                @elseif($role_id === 3)
+                                    @if ($menu_validation == 1)
+                                        <!-- check if patient has nutritionist, then hide edit menu -->
+                                        <a href="{{ route('menu.edit', ['id' => $menu->id]) }}" target="_blank"
+                                            class="btn btn-sm btn-info"><i class="far fa-edit"></i>
+                                            {{ __('Editar menú') }}</a>
+                                        <a data-toggle="modal" data-target="#saveMenuModal"
+                                            class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
+                                            {{ __('Guardar una copia del menú') }} MV</a>
+                                    @elseif($patient->id !== auth()->id())
+                                        <a data-toggle="modal" data-target="#saveMenuModal"
+                                            class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
+                                            {{ __('Guardar una copia del menú') }}NMV: {!! $patient->nutritionist_id !!}</a>
+                                    @endif
                                 @endif
                                 <a href="{{ route('menu.results', ['id' => $menu->id]) }}" target="_blank"
                                     class="btn btn-sm btn-primary"><i class="ni ni-chart-bar-32"></i>
@@ -150,14 +166,11 @@
                             <h5 class="text-muted">
                                 {{ __('Este menú pertenece a otro usuario, para poder usarlo, primero debes guardarlo') }}.
                             </h5>
-                            <h6 class="text-red text-muted">{{ __('Campos requeridos') }} *</h6>
+                            <h6 class="text-red text-muted">{{ __('Todos los campos son requeridos') }}</h6>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label class="form-control-label" for="save_menu_name">{{ __('Nombre') }}
-                                    <span id="name_required" style="color: red;">*</span>
-                                    <span id="name_check" style="display:none;" class="text-green"><i
-                                            class="ni ni-check-bold"></i></span>
                                 </label>
                                 <div class="input-group input-group-alternative">
                                     <div class="input-group-prepend">
@@ -171,9 +184,6 @@
                         <div class="col">
                             <div class="form-group">
                                 <label class="form-control-label" for="save_menu_description">{{ __('Descripción') }}
-                                    <span id="description_required" style="color: red;">*</span>
-                                    <span id="description_check" style="display:none;" class="text-green"><i
-                                            class="ni ni-check-bold"></i></span>
                                 </label>
                                 <div class="input-group input-group-alternative">
                                     <div class="input-group-prepend">
@@ -189,14 +199,11 @@
                                 <div class="form-group">
                                     <label class="form-control-label"
                                         for="">{{ __('Selecciona el usuario a quien asignar el menú actual') }}
-                                        <span id="select_required" style="color: red;">*</span>
-                                        <span id="select_check" style="display:none;" class="text-green"><i
-                                                class="ni ni-check-bold"></i></span></label>
                                     <select id="patient_select" class="form-control">
                                         <option disabled selected>{{ __('Selecciona un paciente') }}</option>
                                         @forelse ($patients as $p)
                                             <option value="{!! $p->id !!}">{{ $p->name }}
-                                                {{ $p->last_name }}</option>
+                                                {{ $p->last_name }} ({{ $p->email }})</option>
                                         @empty
                                             <option disabled>{{ __('Sin opciones disponibles') }}</option>
                                         @endforelse

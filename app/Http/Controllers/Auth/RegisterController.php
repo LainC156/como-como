@@ -165,6 +165,11 @@ class RegisterController extends Controller
         if (!$pending_user) {
             return redirect()->route('login')->with('error', __('Esta cuenta ya ha sido activada anteriormente'));
         }
+        /* verify if email is already in system */
+        $user_verification = User::where('email', $pending_user->email)->first();
+        if ($user_verification) {
+            return redirect()->route('login')->with('error', __('La dirección de correo ya está en uso, intenta con una dirección diferente'));
+        }
         $patient_role = Role::findOrFail(3);
         $nutritionist_role = Role::findOrFail(2);
         $message = '';
