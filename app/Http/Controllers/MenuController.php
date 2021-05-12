@@ -70,8 +70,7 @@ class MenuController extends Controller
             $patient = User::where('users.id', $menu->user_id)
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->first();
-            $patients = User::where('users.id', '<>', $menu->user_id)
-                ->join('patients as p', 'p.user_id', '=', 'users.id')
+            $patients = User::join('patients as p', 'p.user_id', '=', 'users.id')
                 ->where('p.nutritionist_id', $nutritionist->id)
                 ->get();
             /* menu validation: if nutritionist can edit this menu */
