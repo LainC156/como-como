@@ -393,12 +393,24 @@ class MenuController extends Controller
                 ->join('foods', 'foods.id', '=', 'components.food_id')
                 ->where('menus.id', $menu_id)
                 ->select(
-                    DB::raw("SUM(foods.proteins) as proteins"), DB::raw("SUM(foods.carbohydrates) as carbohydrates"), DB::raw("SUM(foods.total_lipids) as lipids"),
-                    DB::raw("SUM(foods.calcium) as calcium"), DB::raw("SUM(foods.phosphorus) as phosphorus "), DB::raw("SUM(foods.iron) as iron"),
-                    DB::raw("SUM(foods.magnesium) as magnesium"), DB::raw("SUM(foods.sodium) as sodium"), DB::raw("SUM(foods.potassium) as potassium"),
-                    DB::raw("SUM(foods.zinc) as zinc"), DB::raw("SUM(foods.vitamin_a) as vitamin_a"), DB::raw("SUM(foods.thiamin) as thiamin"),
-                    DB::raw("SUM(foods.rivoflavin) as rivoflavin"), DB::raw("SUM(foods.niacin) as niacin"), DB::raw("SUM(foods.pyridoxine) as pyridoxine"),
-                    DB::raw("SUM(foods.folic_acid) as folic_acid"), DB::raw("SUM(foods.cobalamin) as cobalamin"), DB::raw("SUM(foods.ascorbic_acid) as ascorbic_acid")
+                    DB::raw("SUM((foods.proteins * components.food_weight)/100) as proteins"),
+                    DB::raw("SUM((foods.carbohydrates * components.food_weight)/100) as carbohydrates"),
+                    DB::raw("SUM((foods.total_lipids * components.food_weight)/100) as lipids"),
+                    DB::raw("SUM((foods.calcium * components.food_weight)/100) as calcium"),
+                    DB::raw("SUM((foods.phosphorus * components.food_weight)/100) as phosphorus "),
+                    DB::raw("SUM((foods.iron * components.food_weight)/100) as iron"),
+                    DB::raw("SUM((foods.magnesium * components.food_weight)/100) as magnesium"),
+                    DB::raw("SUM((foods.sodium * components.food_weight)/100) as sodium"),
+                    DB::raw("SUM((foods.potassium * components.food_weight)/100) as potassium"),
+                    DB::raw("SUM((foods.zinc * components.food_weight)/100) as zinc"),
+                    DB::raw("SUM((foods.vitamin_a * components.food_weight)/100) as vitamin_a"),
+                    DB::raw("SUM((foods.thiamin * components.food_weight)/100) as thiamin"),
+                    DB::raw("SUM((foods.rivoflavin * components.food_weight)/100) as rivoflavin"),
+                    DB::raw("SUM((foods.niacin * components.food_weight)/100) as niacin"),
+                    DB::raw("SUM((foods.pyridoxine * components.food_weight)/100) as pyridoxine"),
+                    DB::raw("SUM((foods.folic_acid * components.food_weight)/100) as folic_acid"),
+                    DB::raw("SUM((foods.cobalamin * components.food_weight)/100) as cobalamin"),
+                    DB::raw("SUM((foods.ascorbic_acid * components.food_weight)/100) as ascorbic_acid")
                 )->get();
             /* MACRONUTRIENTS */
             /* PROTEINS */
@@ -406,7 +418,7 @@ class MenuController extends Controller
             $minCaloriesInProteins = $patient->caloric_requirement * 0.2;
             $maxCaloriesInProteins = $patient->caloric_requirement * 0.35;
             $proteinsStatus = $this->calculateMacronutrientsStatus($caloriesinProteins, $minCaloriesInProteins, $maxCaloriesInProteins);
-            /* CARBOHYDRATES */
+            /* CARBOHYDRATES (amount * carbohidrates in food) then /100) then * 4 */
             $caloriesinCarbohydrates = $sum[0]->carbohydrates * 4;
             $minCaloriesInCarbohydrates = $patient->caloric_requirement * 0.5;
             $maxCaloriesInCarbohydrates = $patient->caloric_requirement * 0.7;
@@ -643,12 +655,24 @@ class MenuController extends Controller
                 ->join('foods', 'foods.id', '=', 'components.food_id')
                 ->where('menus.id', $menu_id)
                 ->select(
-                    DB::raw("SUM(foods.proteins) as proteins"), DB::raw("SUM(foods.carbohydrates) as carbohydrates"), DB::raw("SUM(foods.total_lipids) as lipids"),
-                    DB::raw("SUM(foods.calcium) as calcium"), DB::raw("SUM(foods.phosphorus) as phosphorus "), DB::raw("SUM(foods.iron) as iron"),
-                    DB::raw("SUM(foods.magnesium) as magnesium"), DB::raw("SUM(foods.sodium) as sodium"), DB::raw("SUM(foods.potassium) as potassium"),
-                    DB::raw("SUM(foods.zinc) as zinc"), DB::raw("SUM(foods.vitamin_a) as vitamin_a"), DB::raw("SUM(foods.thiamin) as thiamin"),
-                    DB::raw("SUM(foods.rivoflavin) as rivoflavin"), DB::raw("SUM(foods.niacin) as niacin"), DB::raw("SUM(foods.pyridoxine) as pyridoxine"),
-                    DB::raw("SUM(foods.folic_acid) as folic_acid"), DB::raw("SUM(foods.cobalamin) as cobalamin"), DB::raw("SUM(foods.ascorbic_acid) as ascorbic_acid")
+                    DB::raw("SUM((foods.proteins * components.food_weight)/100) as proteins"),
+                    DB::raw("SUM((foods.carbohydrates * components.food_weight)/100) as carbohydrates"),
+                    DB::raw("SUM((foods.total_lipids * components.food_weight)/100) as lipids"),
+                    DB::raw("SUM((foods.calcium * components.food_weight)/100) as calcium"),
+                    DB::raw("SUM((foods.phosphorus * components.food_weight)/100) as phosphorus "),
+                    DB::raw("SUM((foods.iron * components.food_weight)/100) as iron"),
+                    DB::raw("SUM((foods.magnesium * components.food_weight)/100) as magnesium"),
+                    DB::raw("SUM((foods.sodium * components.food_weight)/100) as sodium"),
+                    DB::raw("SUM((foods.potassium * components.food_weight)/100) as potassium"),
+                    DB::raw("SUM((foods.zinc * components.food_weight)/100) as zinc"),
+                    DB::raw("SUM((foods.vitamin_a * components.food_weight)/100) as vitamin_a"),
+                    DB::raw("SUM((foods.thiamin * components.food_weight)/100) as thiamin"),
+                    DB::raw("SUM((foods.rivoflavin * components.food_weight)/100) as rivoflavin"),
+                    DB::raw("SUM((foods.niacin * components.food_weight)/100) as niacin"),
+                    DB::raw("SUM((foods.pyridoxine * components.food_weight)/100) as pyridoxine"),
+                    DB::raw("SUM((foods.folic_acid * components.food_weight)/100) as folic_acid"),
+                    DB::raw("SUM((foods.cobalamin * components.food_weight)/100) as cobalamin"),
+                    DB::raw("SUM((foods.ascorbic_acid * components.food_weight)/100) as ascorbic_acid")
                 )->get();
             /* MACRONUTRIENTS */
             /* PROTEINS */

@@ -43,9 +43,10 @@ class CheckPayment
             /* check if subscription status is not valid */
             $data = User::where('users.id', $user->id)
                 ->leftJoin('payments as p', 'p.user_id', '=', 'users.id')
-                //->select('p.trial_status', 'p.active', 'p.id', 'users.id as user_id', 'p.expiration_date')
+            //->select('p.trial_status', 'p.active', 'p.id', 'users.id as user_id', 'p.expiration_date')
+                ->where('active', 1)
                 ->orderBy('p.id', 'desc')->first();
-            if ($user->subscription_status === true && !Carbon::parse($data->expiration_date)->lessThan(Carbon::now())) {
+            if ($user->subscription_status === true && Carbon::now()->greaterThan(Carbon::parse($data->expiration_date))) {
                 /* check if user has role patient */
                 /* check if patient was not created by some nutritionist(patients created by nutritionist has no check payment middleware) */
                 $patient = User::where('users.id', $user->id)
@@ -80,6 +81,7 @@ class CheckPayment
                 $nutritionist = User::where('users.id', $user->id)
                     ->join('nutritionists as n', 'n.user_id', '=', 'users.id')
                     ->first();
+                /* check if account belongs to an nutritionist */
                 if ($nutritionist) {
                     try {
                         DB::beginTransaction();

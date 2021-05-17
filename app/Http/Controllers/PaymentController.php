@@ -179,8 +179,9 @@ class PaymentController extends Controller
     {
         if (Auth::user()->hasRole('nutritionist')) {
             $auth = Auth::user();
-            $user = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
-                ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
+            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
+                ->where('users.id', $auth->id)
+                ->where('active', 1)->orderBy('p.id', 'desc')->first();
             $total_patients = DB::table('patients')
                 ->where('nutritionist_id', $auth->id)->count();
             $amount_to_pay = 0;
