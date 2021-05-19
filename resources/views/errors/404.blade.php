@@ -17,6 +17,7 @@
     @include('layouts.headers.guest')
     <div class="container text-center">
         <div class="card">
+            <h2 class="text-primary">{{ __('Error 404') }}</h2>
             <h3>{{ __('No se encontró el recurso solicitado :(') }}</h3>
             <a href="{{ route('home') }}">Regresar a inicio</a>
         </div>

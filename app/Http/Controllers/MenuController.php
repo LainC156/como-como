@@ -383,532 +383,292 @@ class MenuController extends Controller
      */
     public function results($menu_id)
     {
-        if (Auth::user()->hasRole('nutritionist')) {
-            $menu = Menu::where('id', $menu_id)->first();
-            $patient = User::where('users.id', $menu->user_id)
-                ->join('patients as p', 'p.user_id', '=', 'users.id')
-                ->first();
-            $sum = DB::table('menus')
-                ->join('components', 'components.menu_id', '=', 'menus.id')
-                ->join('foods', 'foods.id', '=', 'components.food_id')
-                ->where('menus.id', $menu_id)
-                ->select(
-                    DB::raw("SUM((foods.proteins * components.food_weight)/100) as proteins"),
-                    DB::raw("SUM((foods.carbohydrates * components.food_weight)/100) as carbohydrates"),
-                    DB::raw("SUM((foods.total_lipids * components.food_weight)/100) as lipids"),
-                    DB::raw("SUM((foods.calcium * components.food_weight)/100) as calcium"),
-                    DB::raw("SUM((foods.phosphorus * components.food_weight)/100) as phosphorus "),
-                    DB::raw("SUM((foods.iron * components.food_weight)/100) as iron"),
-                    DB::raw("SUM((foods.magnesium * components.food_weight)/100) as magnesium"),
-                    DB::raw("SUM((foods.sodium * components.food_weight)/100) as sodium"),
-                    DB::raw("SUM((foods.potassium * components.food_weight)/100) as potassium"),
-                    DB::raw("SUM((foods.zinc * components.food_weight)/100) as zinc"),
-                    DB::raw("SUM((foods.vitamin_a * components.food_weight)/100) as vitamin_a"),
-                    DB::raw("SUM((foods.thiamin * components.food_weight)/100) as thiamin"),
-                    DB::raw("SUM((foods.rivoflavin * components.food_weight)/100) as rivoflavin"),
-                    DB::raw("SUM((foods.niacin * components.food_weight)/100) as niacin"),
-                    DB::raw("SUM((foods.pyridoxine * components.food_weight)/100) as pyridoxine"),
-                    DB::raw("SUM((foods.folic_acid * components.food_weight)/100) as folic_acid"),
-                    DB::raw("SUM((foods.cobalamin * components.food_weight)/100) as cobalamin"),
-                    DB::raw("SUM((foods.ascorbic_acid * components.food_weight)/100) as ascorbic_acid")
-                )->get();
-            /* MACRONUTRIENTS */
-            /* PROTEINS */
-            $caloriesinProteins = $sum[0]->proteins * 4;
-            $minCaloriesInProteins = $patient->caloric_requirement * 0.2;
-            $maxCaloriesInProteins = $patient->caloric_requirement * 0.35;
-            $proteinsStatus = $this->calculateMacronutrientsStatus($caloriesinProteins, $minCaloriesInProteins, $maxCaloriesInProteins);
-            /* CARBOHYDRATES (amount * carbohidrates in food) then /100) then * 4 */
-            $caloriesinCarbohydrates = $sum[0]->carbohydrates * 4;
-            $minCaloriesInCarbohydrates = $patient->caloric_requirement * 0.5;
-            $maxCaloriesInCarbohydrates = $patient->caloric_requirement * 0.7;
-            $carbohydratesStatus = $this->calculateMacronutrientsStatus($caloriesinCarbohydrates, $minCaloriesInCarbohydrates, $maxCaloriesInCarbohydrates);
-            /* LIPIDS */
-            $caloriesinLipids = $sum[0]->lipids * 9;
-            $minCaloriesInLipids = $patient->caloric_requirement * 0.2;
-            $maxCaloriesInLipids = $patient->caloric_requirement * 0.3;
-            $lipidsStatus = $this->calculateMacronutrientsStatus($caloriesinLipids, $minCaloriesInLipids, $maxCaloriesInLipids);
-            /* MICRONUTRIENTS */
-            /* calcium*/
-            $minCalcium = 1000;
-            $totalCalcium = $sum[0]->calcium;
-            $calciumStatus = ($totalCalcium < $minCalcium) ? 0 : 1;
-            /* phosphorus */
-            $minPhosphorus = 700;
-            $totalPhosphorus = $sum[0]->phosphorus;
-            $phosphorusStatus = ($totalPhosphorus < $minPhosphorus) ? 0 : 1;
-            /* sodium */
-            $minSodium = 500;
-            $totalSodium = $sum[0]->sodium;
-            $sodiumStatus = ($totalSodium < $minSodium) ? 0 : 1;
-            /* potassium */
-            $minPotassium = 2000;
-            $totalPotassium = $sum[0]->potassium;
-            $potassiumStatus = ($totalPotassium < $minPotassium) ? 0 : 1;
-            /* vitamin B6 pyridoxine */
-            $minVitaminB6 = 1.3;
-            $totalVitaminB6 = $sum[0]->pyridoxine;
-            $vitaminB6Status = ($totalVitaminB6 < $minVitaminB6) ? 0 : 1;
-            /* vitamin b9 folic_acid */
-            $minVitaminB9 = 400;
-            $totalVitaminB9 = $sum[0]->folic_acid;
-            $vitaminB9Status = ($totalVitaminB9 < $minVitaminB9) ? 0 : 1;
-            /* vitamin b12 cobalamin*/
-            $minVitaminB12 = 2.4;
-            $totalVitaminB12 = $sum[0]->cobalamin;
-            $vitaminB12Status = ($totalVitaminB12 < $minVitaminB12) ? 0 : 1;
-            /* certain micronutrients requires a special calculation depending on the gender */
-            /* genre = 0 : man, genre = 1: woman */
-            /* iron */
-            $minIron = $patient->genre == 0 ? 8 : 18;
-            $totalIron = $sum[0]->iron;
-            $ironStatus = ($totalIron < $minIron) ? 0 : 1;
-            /* magnesium */
-            $minMagnesium = $patient->genre == 0 ? 420 : 320;
-            $totalMagnesium = $sum[0]->magnesium;
-            $magnesiumStatus = ($totalMagnesium < $minMagnesium) ? 0 : 1;
-            /* zinc */
-            $minZinc = $patient->genre == 0 ? 11 : 8;
-            $totalZinc = $sum[0]->zinc;
-            $zincStatus = ($totalZinc < $minZinc) ? 0 : 1;
-            /* vitamin A */
-            $minVitaminA = $patient->genre == 0 ? 900 : 700;
-            $totalVitaminA = $sum[0]->vitamin_a;
-            $vitaminAStatus = ($totalVitaminA < $minVitaminA) ? 0 : 1;
-            /* vitamin B1 */
-            $minVitaminB1 = $patient->genre == 0 ? 1.2 : 1.1;
-            $totalVitaminB1 = $sum[0]->thiamin;
-            $vitaminB1Status = ($totalVitaminB1 < $minVitaminB1) ? 0 : 1;
-            /* vitamin B2 */
-            $minVitaminB2 = $patient->genre == 0 ? 1.3 : 1.1;
-            $totalVitaminB2 = $sum[0]->rivoflavin;
-            $vitaminB2Status = ($totalVitaminB2 < $minVitaminB2) ? 0 : 1;
-            /* vitamin B3 */
-            $minVitaminB3 = $patient->genre == 0 ? 16 : 14;
-            $totalVitaminB3 = $sum[0]->niacin;
-            $vitaminB3Status = ($totalVitaminB3 < $minVitaminB3) ? 0 : 1;
-            /* vitamin C */
-            $minVitaminC = $patient->genre == 0 ? 90 : 75;
-            $totalVitaminC = $sum[0]->ascorbic_acid;
-            $vitaminCStatus = ($totalVitaminC < $minVitaminC) ? 0 : 1;
-            /* define whether the menu is ideal or not */
-            if ($proteinsStatus != 1 || $carbohydratesStatus != 1 || $lipidsStatus != 1 || $calciumStatus != 1 || $phosphorusStatus != 1 || $sodiumStatus != 1 || $potassiumStatus != 1 || $vitaminB6Status != 1 || $vitaminB9Status != 1 || $vitaminB12Status != 1 || $ironStatus != 1 || $magnesiumStatus != 1 || $zincStatus != 1 || $vitaminAStatus != 1 || $vitaminB1Status != 1 || $vitaminB2Status != 1 || $vitaminB3Status != 1 || $vitaminCStatus != 1) {
-                $ideal = 0;
-            } else { $ideal = 1;}
-            /* SAVE RESULTS FROM MENU */
-            /* first check if results row exists in results table */
-            $results_data = DB::table('results')
-                ->where('id', $menu_id)
-                ->first();
-            if ($results_data) {
-                try {
-                    DB::beginTransaction();
-                    /* update ideal field in menu table if necessary */
-                    if ($ideal != $menu->ideal) {
-                        $menu->ideal = $ideal;
-                        $menu->update();
-                    }
-                    DB::table('results')
-                        ->where('id', $menu_id)
-                        ->update([
-                            'carbohydrates' => $caloriesinCarbohydrates,
-                            'carbohydratesStatus' => $carbohydratesStatus,
-                            'proteins' => $caloriesinProteins,
-                            'proteinsStatus' => $proteinsStatus,
-                            'lipids' => $caloriesinLipids,
-                            'lipidsStatus' => $lipidsStatus,
-                            'calcium' => $totalCalcium,
-                            'calciumStatus' => $calciumStatus,
-                            'phosphorus' => $totalPhosphorus,
-                            'phosphorusStatus' => $phosphorusStatus,
-                            'iron' => $totalIron,
-                            'ironStatus' => $ironStatus,
-                            'magnesium' => $totalMagnesium,
-                            'magnesiumStatus' => $magnesiumStatus,
-                            'sodium' => $totalSodium,
-                            'sodiumStatus' => $sodiumStatus,
-                            'potassium' => $totalPotassium,
-                            'potassiumStatus' => $potassiumStatus,
-                            'zinc' => $totalZinc,
-                            'zincStatus' => $zincStatus,
-                            'vitaminA' => $totalVitaminA,
-                            'vitaminAStatus' => $vitaminAStatus,
-                            'vitaminB1' => $totalVitaminB1,
-                            'vitaminB1Status' => $vitaminB1Status,
-                            'vitaminB2' => $totalVitaminB2,
-                            'vitaminB2Status' => $vitaminB2Status,
-                            'vitaminB3' => $totalVitaminB3,
-                            'vitaminB3Status' => $vitaminB3Status,
-                            'vitaminB6' => $totalVitaminB6,
-                            'vitaminB6Status' => $vitaminB6Status,
-                            'vitaminB9' => $totalVitaminB9,
-                            'vitaminB9Status' => $vitaminB9Status,
-                            'vitaminB12' => $totalVitaminB12,
-                            'vitaminB12Status' => $vitaminB12Status,
-                            'vitaminC' => $totalVitaminC,
-                            'vitaminCStatus' => $vitaminCStatus,
-                            'updated_at' => Carbon::now(),
-                        ]);
-                } catch (\Illuminate\Database\QueryException $ex) {
-                    DB::rollback();
-                } catch (\Exception $ex) {
-                    DB::rollback();
-                } finally {
-                    DB::commit();
-                }
-            } else {
-                try {
-                    DB::beginTransaction();
-                    /* update ideal field in menu table if necessary */
-                    if ($ideal != $menu->ideal) {
-                        $menu->ideal = $ideal;
-                        $menu->update();
-                    }
-                    DB::table('results')
-                        ->insert([
-                            'id' => $menu_id,
-                            'carbohydrates' => $caloriesinCarbohydrates,
-                            'carbohydratesStatus' => $carbohydratesStatus,
-                            'proteins' => $caloriesinProteins,
-                            'proteinsStatus' => $proteinsStatus,
-                            'lipids' => $caloriesinLipids,
-                            'lipidsStatus' => $lipidsStatus,
-                            'calcium' => $totalCalcium,
-                            'calciumStatus' => $calciumStatus,
-                            'phosphorus' => $totalPhosphorus,
-                            'phosphorusStatus' => $phosphorusStatus,
-                            'iron' => $totalIron,
-                            'ironStatus' => $ironStatus,
-                            'magnesium' => $totalMagnesium,
-                            'magnesiumStatus' => $magnesiumStatus,
-                            'sodium' => $totalSodium,
-                            'sodiumStatus' => $sodiumStatus,
-                            'potassium' => $totalPotassium,
-                            'potassiumStatus' => $potassiumStatus,
-                            'zinc' => $totalZinc,
-                            'zincStatus' => $zincStatus,
-                            'vitaminA' => $totalVitaminA,
-                            'vitaminAStatus' => $vitaminAStatus,
-                            'vitaminB1' => $totalVitaminB1,
-                            'vitaminB1Status' => $vitaminB1Status,
-                            'vitaminB2' => $totalVitaminB2,
-                            'vitaminB2Status' => $vitaminB2Status,
-                            'vitaminB3' => $totalVitaminB3,
-                            'vitaminB3Status' => $vitaminB3Status,
-                            'vitaminB6' => $totalVitaminB6,
-                            'vitaminB6Status' => $vitaminB6Status,
-                            'vitaminB9' => $totalVitaminB9,
-                            'vitaminB9Status' => $vitaminB9Status,
-                            'vitaminB12' => $totalVitaminB12,
-                            'vitaminB12Status' => $vitaminB12Status,
-                            'vitaminC' => $totalVitaminC,
-                            'vitaminCStatus' => $vitaminCStatus,
-                            'created_at' => Carbon::now(),
-                        ]);
-                    DB::commit();
-                } catch (\Illuminate\Database\QueryException $ex) {
-                    DB::rollback();
-                    //dd($ex);
-                    $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
-                    //return response()->json($msg, 400);
-                } catch (\Exception $ex) {
-                    DB::rollback();
-                    $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
-                    //return response()->json($msg, 400);
-                }
-            }
-            /* data to display on blade */
-            $results = DB::table('results')
-                ->where('id', $menu_id)
-                ->get();
-            return view('menus.results', [
-                'menu_data' => $menu, 'patient' => $patient,
-                'results' => $results,
-                'minCaloriesInCarbohydrates' => $minCaloriesInCarbohydrates, 'maxCaloriesInCarbohydrates' => $maxCaloriesInCarbohydrates,
-                'minCaloriesInProteins' => $minCaloriesInProteins, 'maxCaloriesInProteins' => $maxCaloriesInProteins,
-                'minCaloriesInLipids' => $minCaloriesInLipids, 'maxCaloriesInLipids' => $maxCaloriesInLipids,
-                'minCalcium' => $minCalcium,
-                'minPhosphorus' => $minPhosphorus,
-                'minIron' => $minIron,
-                'minMagnesium' => $minMagnesium,
-                'minSodium' => $minSodium,
-                'minPotassium' => $minPotassium,
-                'minZinc' => $minZinc,
-                'minVitaminA' => $minVitaminA,
-                'minVitaminB1' => $minVitaminB1,
-                'minVitaminB2' => $minVitaminB2,
-                'minVitaminB3' => $minVitaminB3,
-                'minVitaminB6' => $minVitaminB6,
-                'minVitaminB9' => $minVitaminB9,
-                'minVitaminB12' => $minVitaminB12,
-                'minVitaminC' => $minVitaminC,
-                'role_id' => 2,
-            ]);
-
-        } else if (Auth::user()->hasRole('patient')) {
-            $menu = Menu::where('id', $menu_id)->first();
-            $patient = User::where('users.id', $menu->user_id)
-                ->join('patients as p', 'p.user_id', '=', 'users.id')
-                ->first();
-            $sum = DB::table('menus')
-                ->join('components', 'components.menu_id', '=', 'menus.id')
-                ->join('foods', 'foods.id', '=', 'components.food_id')
-                ->where('menus.id', $menu_id)
-                ->select(
-                    DB::raw("SUM((foods.proteins * components.food_weight)/100) as proteins"),
-                    DB::raw("SUM((foods.carbohydrates * components.food_weight)/100) as carbohydrates"),
-                    DB::raw("SUM((foods.total_lipids * components.food_weight)/100) as lipids"),
-                    DB::raw("SUM((foods.calcium * components.food_weight)/100) as calcium"),
-                    DB::raw("SUM((foods.phosphorus * components.food_weight)/100) as phosphorus "),
-                    DB::raw("SUM((foods.iron * components.food_weight)/100) as iron"),
-                    DB::raw("SUM((foods.magnesium * components.food_weight)/100) as magnesium"),
-                    DB::raw("SUM((foods.sodium * components.food_weight)/100) as sodium"),
-                    DB::raw("SUM((foods.potassium * components.food_weight)/100) as potassium"),
-                    DB::raw("SUM((foods.zinc * components.food_weight)/100) as zinc"),
-                    DB::raw("SUM((foods.vitamin_a * components.food_weight)/100) as vitamin_a"),
-                    DB::raw("SUM((foods.thiamin * components.food_weight)/100) as thiamin"),
-                    DB::raw("SUM((foods.rivoflavin * components.food_weight)/100) as rivoflavin"),
-                    DB::raw("SUM((foods.niacin * components.food_weight)/100) as niacin"),
-                    DB::raw("SUM((foods.pyridoxine * components.food_weight)/100) as pyridoxine"),
-                    DB::raw("SUM((foods.folic_acid * components.food_weight)/100) as folic_acid"),
-                    DB::raw("SUM((foods.cobalamin * components.food_weight)/100) as cobalamin"),
-                    DB::raw("SUM((foods.ascorbic_acid * components.food_weight)/100) as ascorbic_acid")
-                )->get();
-            /* MACRONUTRIENTS */
-            /* PROTEINS */
-            $caloriesinProteins = $sum[0]->proteins * 4;
-            $minCaloriesInProteins = $patient->caloric_requirement * 0.2;
-            $maxCaloriesInProteins = $patient->caloric_requirement * 0.35;
-            $proteinsStatus = $this->calculateMacronutrientsStatus($caloriesinProteins, $minCaloriesInProteins, $maxCaloriesInProteins);
-            /* CARBOHYDRATES */
-            $caloriesinCarbohydrates = $sum[0]->carbohydrates * 4;
-            $minCaloriesInCarbohydrates = $patient->caloric_requirement * 0.5;
-            $maxCaloriesInCarbohydrates = $patient->caloric_requirement * 0.7;
-            $carbohydratesStatus = $this->calculateMacronutrientsStatus($caloriesinCarbohydrates, $minCaloriesInCarbohydrates, $maxCaloriesInCarbohydrates);
-            /* LIPIDS */
-            $caloriesinLipids = $sum[0]->lipids * 9;
-            $minCaloriesInLipids = $patient->caloric_requirement * 0.2;
-            $maxCaloriesInLipids = $patient->caloric_requirement * 0.3;
-            $lipidsStatus = $this->calculateMacronutrientsStatus($caloriesinLipids, $minCaloriesInLipids, $maxCaloriesInLipids);
-            /* MICRONUTRIENTS */
-            /* calcium*/
-            $minCalcium = 1000;
-            $totalCalcium = $sum[0]->calcium;
-            $calciumStatus = ($totalCalcium < $minCalcium) ? 0 : 1;
-            /* phosphorus */
-            $minPhosphorus = 700;
-            $totalPhosphorus = $sum[0]->phosphorus;
-            $phosphorusStatus = ($totalPhosphorus < $minPhosphorus) ? 0 : 1;
-            /* sodium */
-            $minSodium = 500;
-            $totalSodium = $sum[0]->sodium;
-            $sodiumStatus = ($totalSodium < $minSodium) ? 0 : 1;
-            /* potassium */
-            $minPotassium = 2000;
-            $totalPotassium = $sum[0]->potassium;
-            $potassiumStatus = ($totalPotassium < $minPotassium) ? 0 : 1;
-            /* vitamin B6 pyridoxine */
-            $minVitaminB6 = 1.3;
-            $totalVitaminB6 = $sum[0]->pyridoxine;
-            $vitaminB6Status = ($totalVitaminB6 < $minVitaminB6) ? 0 : 1;
-            /* vitamin b9 folic_acid */
-            $minVitaminB9 = 400;
-            $totalVitaminB9 = $sum[0]->folic_acid;
-            $vitaminB9Status = ($totalVitaminB9 < $minVitaminB9) ? 0 : 1;
-            /* vitamin b12 cobalamin*/
-            $minVitaminB12 = 2.4;
-            $totalVitaminB12 = $sum[0]->cobalamin;
-            $vitaminB12Status = ($totalVitaminB12 < $minVitaminB12) ? 0 : 1;
-            /* certain micronutrients requires a special calculation depending on the gender */
-            /* genre = 0 : man, genre = 1: woman */
-            /* iron */
-            $minIron = $patient->genre == 0 ? 8 : 18;
-            $totalIron = $sum[0]->iron;
-            $ironStatus = ($totalIron < $minIron) ? 0 : 1;
-            /* magnesium */
-            $minMagnesium = $patient->genre == 0 ? 420 : 320;
-            $totalMagnesium = $sum[0]->magnesium;
-            $magnesiumStatus = ($totalMagnesium < $minMagnesium) ? 0 : 1;
-            /* zinc */
-            $minZinc = $patient->genre == 0 ? 11 : 8;
-            $totalZinc = $sum[0]->zinc;
-            $zincStatus = ($totalZinc < $minZinc) ? 0 : 1;
-            /* vitamin A */
-            $minVitaminA = $patient->genre == 0 ? 900 : 700;
-            $totalVitaminA = $sum[0]->vitamin_a;
-            $vitaminAStatus = ($totalVitaminA < $minVitaminA) ? 0 : 1;
-            /* vitamin B1 */
-            $minVitaminB1 = $patient->genre == 0 ? 1.2 : 1.1;
-            $totalVitaminB1 = $sum[0]->thiamin;
-            $vitaminB1Status = ($totalVitaminB1 < $minVitaminB1) ? 0 : 1;
-            /* vitamin B2 */
-            $minVitaminB2 = $patient->genre == 0 ? 1.3 : 1.1;
-            $totalVitaminB2 = $sum[0]->rivoflavin;
-            $vitaminB2Status = ($totalVitaminB2 < $minVitaminB2) ? 0 : 1;
-            /* vitamin B3 */
-            $minVitaminB3 = $patient->genre == 0 ? 16 : 14;
-            $totalVitaminB3 = $sum[0]->niacin;
-            $vitaminB3Status = ($totalVitaminB3 < $minVitaminB3) ? 0 : 1;
-            /* vitamin C */
-            $minVitaminC = $patient->genre == 0 ? 90 : 75;
-            $totalVitaminC = $sum[0]->ascorbic_acid;
-            $vitaminCStatus = ($totalVitaminC < $minVitaminC) ? 0 : 1;
-            /* define whether the menu is ideal or not */
-            if ($proteinsStatus != 1 || $carbohydratesStatus != 1 || $lipidsStatus != 1 || $calciumStatus != 1 || $phosphorusStatus != 1 || $sodiumStatus != 1 || $potassiumStatus != 1 || $vitaminB6Status != 1 || $vitaminB9Status != 1 || $vitaminB12Status != 1 || $ironStatus != 1 || $magnesiumStatus != 1 || $zincStatus != 1 || $vitaminAStatus != 1 || $vitaminB1Status != 1 || $vitaminB2Status != 1 || $vitaminB3Status != 1 || $vitaminCStatus != 1) {
-                $ideal = 0;
-            } else { $ideal = 1;}
-            /* SAVE RESULTS FROM MENU */
-            /* first check if results row exists in results table */
-            $results_data = DB::table('results')
-                ->where('id', $menu_id)
-                ->first();
-            if ($results_data) {
-                try {
-                    DB::beginTransaction();
-                    /* update ideal field in menu table if necessary */
-                    if ($ideal != $menu->ideal) {
-                        $menu->ideal = $ideal;
-                        $menu->update();
-                    }
-                    DB::table('results')
-                        ->where('id', $menu_id)
-                        ->update([
-                            'carbohydrates' => $caloriesinCarbohydrates,
-                            'carbohydratesStatus' => $carbohydratesStatus,
-                            'proteins' => $caloriesinProteins,
-                            'proteinsStatus' => $proteinsStatus,
-                            'lipids' => $caloriesinLipids,
-                            'lipidsStatus' => $lipidsStatus,
-                            'calcium' => $totalCalcium,
-                            'calciumStatus' => $calciumStatus,
-                            'phosphorus' => $totalPhosphorus,
-                            'phosphorusStatus' => $phosphorusStatus,
-                            'iron' => $totalIron,
-                            'ironStatus' => $ironStatus,
-                            'magnesium' => $totalMagnesium,
-                            'magnesiumStatus' => $magnesiumStatus,
-                            'sodium' => $totalSodium,
-                            'sodiumStatus' => $sodiumStatus,
-                            'potassium' => $totalPotassium,
-                            'potassiumStatus' => $potassiumStatus,
-                            'zinc' => $totalZinc,
-                            'zincStatus' => $zincStatus,
-                            'vitaminA' => $totalVitaminA,
-                            'vitaminAStatus' => $vitaminAStatus,
-                            'vitaminB1' => $totalVitaminB1,
-                            'vitaminB1Status' => $vitaminB1Status,
-                            'vitaminB2' => $totalVitaminB2,
-                            'vitaminB2Status' => $vitaminB2Status,
-                            'vitaminB3' => $totalVitaminB3,
-                            'vitaminB3Status' => $vitaminB3Status,
-                            'vitaminB6' => $totalVitaminB6,
-                            'vitaminB6Status' => $vitaminB6Status,
-                            'vitaminB9' => $totalVitaminB9,
-                            'vitaminB9Status' => $vitaminB9Status,
-                            'vitaminB12' => $totalVitaminB12,
-                            'vitaminB12Status' => $vitaminB12Status,
-                            'vitaminC' => $totalVitaminC,
-                            'vitaminCStatus' => $vitaminCStatus,
-                            'updated_at' => Carbon::now(),
-                        ]);
-                } catch (\Illuminate\Database\QueryException $ex) {
-                    DB::rollback();
-                } catch (\Exception $ex) {
-                    DB::rollback();
-                } finally {
-                    DB::commit();
-                }
-            } else {
-                try {
-                    DB::beginTransaction();
-                    /* update ideal field in menu table if necessary */
-                    if ($ideal != $menu->ideal) {
-                        $menu->ideal = $ideal;
-                        $menu->update();
-                    }
-                    DB::table('results')
-                        ->insert([
-                            'id' => $menu_id,
-                            'carbohydrates' => $caloriesinCarbohydrates,
-                            'carbohydratesStatus' => $carbohydratesStatus,
-                            'proteins' => $caloriesinProteins,
-                            'proteinsStatus' => $proteinsStatus,
-                            'lipids' => $caloriesinLipids,
-                            'lipidsStatus' => $lipidsStatus,
-                            'calcium' => $totalCalcium,
-                            'calciumStatus' => $calciumStatus,
-                            'phosphorus' => $totalPhosphorus,
-                            'phosphorusStatus' => $phosphorusStatus,
-                            'iron' => $totalIron,
-                            'ironStatus' => $ironStatus,
-                            'magnesium' => $totalMagnesium,
-                            'magnesiumStatus' => $magnesiumStatus,
-                            'sodium' => $totalSodium,
-                            'sodiumStatus' => $sodiumStatus,
-                            'potassium' => $totalPotassium,
-                            'potassiumStatus' => $potassiumStatus,
-                            'zinc' => $totalZinc,
-                            'zincStatus' => $zincStatus,
-                            'vitaminA' => $totalVitaminA,
-                            'vitaminAStatus' => $vitaminAStatus,
-                            'vitaminB1' => $totalVitaminB1,
-                            'vitaminB1Status' => $vitaminB1Status,
-                            'vitaminB2' => $totalVitaminB2,
-                            'vitaminB2Status' => $vitaminB2Status,
-                            'vitaminB3' => $totalVitaminB3,
-                            'vitaminB3Status' => $vitaminB3Status,
-                            'vitaminB6' => $totalVitaminB6,
-                            'vitaminB6Status' => $vitaminB6Status,
-                            'vitaminB9' => $totalVitaminB9,
-                            'vitaminB9Status' => $vitaminB9Status,
-                            'vitaminB12' => $totalVitaminB12,
-                            'vitaminB12Status' => $vitaminB12Status,
-                            'vitaminC' => $totalVitaminC,
-                            'vitaminCStatus' => $vitaminCStatus,
-                            'created_at' => Carbon::now(),
-                        ]);
-                    DB::commit();
-                } catch (\Illuminate\Database\QueryException $ex) {
-                    DB::rollback();
-                    //dd($ex);
-                    $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
-                    //return response()->json($msg, 400);
-                } catch (\Exception $ex) {
-                    DB::rollback();
-                    $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
-                    //return response()->json($msg, 400);
-                }
-            }
-            /* data to display on blade */
-            $results = DB::table('results')
-                ->where('id', $menu_id)
-                ->get();
-            return view('menus.results', [
-                'menu_data' => $menu, 'patient' => $patient,
-                'results' => $results,
-                'minCaloriesInCarbohydrates' => $minCaloriesInCarbohydrates, 'maxCaloriesInCarbohydrates' => $maxCaloriesInCarbohydrates,
-                'minCaloriesInProteins' => $minCaloriesInProteins, 'maxCaloriesInProteins' => $maxCaloriesInProteins,
-                'minCaloriesInLipids' => $minCaloriesInLipids, 'maxCaloriesInLipids' => $maxCaloriesInLipids,
-                'minCalcium' => $minCalcium,
-                'minPhosphorus' => $minPhosphorus,
-                'minIron' => $minIron,
-                'minMagnesium' => $minMagnesium,
-                'minSodium' => $minSodium,
-                'minPotassium' => $minPotassium,
-                'minZinc' => $minZinc,
-                'minVitaminA' => $minVitaminA,
-                'minVitaminB1' => $minVitaminB1,
-                'minVitaminB2' => $minVitaminB2,
-                'minVitaminB3' => $minVitaminB3,
-                'minVitaminB6' => $minVitaminB6,
-                'minVitaminB9' => $minVitaminB9,
-                'minVitaminB12' => $minVitaminB12,
-                'minVitaminC' => $minVitaminC,
-                'role_id' => 3,
-            ]);
+        $menu = Menu::where('id', $menu_id)->first();
+        if (!$menu) {
+            abort(404);
         }
+        $patient = User::where('users.id', $menu->user_id)
+            ->join('patients as p', 'p.user_id', '=', 'users.id')
+            ->first();
+        $sum = DB::table('menus')
+            ->join('components', 'components.menu_id', '=', 'menus.id')
+            ->join('foods', 'foods.id', '=', 'components.food_id')
+            ->where('menus.id', $menu_id)
+            ->select(
+                DB::raw("SUM((foods.proteins * components.food_weight)/100) as proteins"),
+                DB::raw("SUM((foods.carbohydrates * components.food_weight)/100) as carbohydrates"),
+                DB::raw("SUM((foods.total_lipids * components.food_weight)/100) as lipids"),
+                DB::raw("SUM((foods.calcium * components.food_weight)/100) as calcium"),
+                DB::raw("SUM((foods.phosphorus * components.food_weight)/100) as phosphorus "),
+                DB::raw("SUM((foods.iron * components.food_weight)/100) as iron"),
+                DB::raw("SUM((foods.magnesium * components.food_weight)/100) as magnesium"),
+                DB::raw("SUM((foods.sodium * components.food_weight)/100) as sodium"),
+                DB::raw("SUM((foods.potassium * components.food_weight)/100) as potassium"),
+                DB::raw("SUM((foods.zinc * components.food_weight)/100) as zinc"),
+                DB::raw("SUM((foods.vitamin_a * components.food_weight)/100) as vitamin_a"),
+                DB::raw("SUM((foods.thiamin * components.food_weight)/100) as thiamin"),
+                DB::raw("SUM((foods.rivoflavin * components.food_weight)/100) as rivoflavin"),
+                DB::raw("SUM((foods.niacin * components.food_weight)/100) as niacin"),
+                DB::raw("SUM((foods.pyridoxine * components.food_weight)/100) as pyridoxine"),
+                DB::raw("SUM((foods.folic_acid * components.food_weight)/100) as folic_acid"),
+                DB::raw("SUM((foods.cobalamin * components.food_weight)/100) as cobalamin"),
+                DB::raw("SUM((foods.ascorbic_acid * components.food_weight)/100) as ascorbic_acid"),
+                DB::raw("SUM((foods.kcal * components.food_weight)/100) as kcal"),
+                DB::raw("SUM((foods.kj * components.food_weight)/100) as kj"),
+                DB::raw("SUM((foods.water * components.food_weight)/100) as water"),
+                DB::raw("SUM((foods.dietary_fiber * components.food_weight)/100) as dietary_fiber"),
+                DB::raw("SUM((foods.cholesterol * components.food_weight)/100) as cholesterol"),
+            )->get();
+        /* MACRONUTRIENTS */
+        /* PROTEINS */
+        $caloriesinProteins = $sum[0]->proteins * 4;
+        $minCaloriesInProteins = $patient->caloric_requirement * 0.2;
+        $maxCaloriesInProteins = $patient->caloric_requirement * 0.35;
+        $proteinsStatus = $this->calculateMacronutrientsStatus($caloriesinProteins, $minCaloriesInProteins, $maxCaloriesInProteins);
+        /* CARBOHYDRATES (amount * carbohidrates in food) then /100) then * 4 */
+        $caloriesinCarbohydrates = $sum[0]->carbohydrates * 4;
+        $minCaloriesInCarbohydrates = $patient->caloric_requirement * 0.5;
+        $maxCaloriesInCarbohydrates = $patient->caloric_requirement * 0.7;
+        $carbohydratesStatus = $this->calculateMacronutrientsStatus($caloriesinCarbohydrates, $minCaloriesInCarbohydrates, $maxCaloriesInCarbohydrates);
+        /* LIPIDS */
+        $caloriesinLipids = $sum[0]->lipids * 9;
+        $minCaloriesInLipids = $patient->caloric_requirement * 0.2;
+        $maxCaloriesInLipids = $patient->caloric_requirement * 0.3;
+        $lipidsStatus = $this->calculateMacronutrientsStatus($caloriesinLipids, $minCaloriesInLipids, $maxCaloriesInLipids);
+        /* MICRONUTRIENTS */
+        /* calcium*/
+        $minCalcium = 1000;
+        $totalCalcium = $sum[0]->calcium;
+        $calciumStatus = ($totalCalcium < $minCalcium) ? 0 : 1;
+        /* phosphorus */
+        $minPhosphorus = 700;
+        $totalPhosphorus = $sum[0]->phosphorus;
+        $phosphorusStatus = ($totalPhosphorus < $minPhosphorus) ? 0 : 1;
+        /* sodium */
+        $minSodium = 500;
+        $totalSodium = $sum[0]->sodium;
+        $sodiumStatus = ($totalSodium < $minSodium) ? 0 : 1;
+        /* potassium */
+        $minPotassium = 2000;
+        $totalPotassium = $sum[0]->potassium;
+        $potassiumStatus = ($totalPotassium < $minPotassium) ? 0 : 1;
+        /* vitamin B6 pyridoxine */
+        $minVitaminB6 = 1.3;
+        $totalVitaminB6 = $sum[0]->pyridoxine;
+        $vitaminB6Status = ($totalVitaminB6 < $minVitaminB6) ? 0 : 1;
+        /* vitamin b9 folic_acid */
+        $minVitaminB9 = 400;
+        $totalVitaminB9 = $sum[0]->folic_acid;
+        $vitaminB9Status = ($totalVitaminB9 < $minVitaminB9) ? 0 : 1;
+        /* vitamin b12 cobalamin*/
+        $minVitaminB12 = 2.4;
+        $totalVitaminB12 = $sum[0]->cobalamin;
+        $vitaminB12Status = ($totalVitaminB12 < $minVitaminB12) ? 0 : 1;
+        /* certain micronutrients requires a special calculation depending on the gender */
+        /* genre = 0 : man, genre = 1: woman */
+        /* iron */
+        $minIron = $patient->genre == 0 ? 8 : 18;
+        $totalIron = $sum[0]->iron;
+        $ironStatus = ($totalIron < $minIron) ? 0 : 1;
+        /* magnesium */
+        $minMagnesium = $patient->genre == 0 ? 420 : 320;
+        $totalMagnesium = $sum[0]->magnesium;
+        $magnesiumStatus = ($totalMagnesium < $minMagnesium) ? 0 : 1;
+        /* zinc */
+        $minZinc = $patient->genre == 0 ? 11 : 8;
+        $totalZinc = $sum[0]->zinc;
+        $zincStatus = ($totalZinc < $minZinc) ? 0 : 1;
+        /* vitamin A */
+        $minVitaminA = $patient->genre == 0 ? 900 : 700;
+        $totalVitaminA = $sum[0]->vitamin_a;
+        $vitaminAStatus = ($totalVitaminA < $minVitaminA) ? 0 : 1;
+        /* vitamin B1 */
+        $minVitaminB1 = $patient->genre == 0 ? 1.2 : 1.1;
+        $totalVitaminB1 = $sum[0]->thiamin;
+        $vitaminB1Status = ($totalVitaminB1 < $minVitaminB1) ? 0 : 1;
+        /* vitamin B2 */
+        $minVitaminB2 = $patient->genre == 0 ? 1.3 : 1.1;
+        $totalVitaminB2 = $sum[0]->rivoflavin;
+        $vitaminB2Status = ($totalVitaminB2 < $minVitaminB2) ? 0 : 1;
+        /* vitamin B3 */
+        $minVitaminB3 = $patient->genre == 0 ? 16 : 14;
+        $totalVitaminB3 = $sum[0]->niacin;
+        $vitaminB3Status = ($totalVitaminB3 < $minVitaminB3) ? 0 : 1;
+        /* vitamin C */
+        $minVitaminC = $patient->genre == 0 ? 90 : 75;
+        $totalVitaminC = $sum[0]->ascorbic_acid;
+        $vitaminCStatus = ($totalVitaminC < $minVitaminC) ? 0 : 1;
+        /* define whether the menu is ideal or not */
+        if ($proteinsStatus != 1 || $carbohydratesStatus != 1 || $lipidsStatus != 1 || $calciumStatus != 1 || $phosphorusStatus != 1 ||
+            $sodiumStatus != 1 || $potassiumStatus != 1 || $vitaminB6Status != 1 || $vitaminB9Status != 1 ||
+            $vitaminB12Status != 1 || $ironStatus != 1 || $magnesiumStatus != 1 || $zincStatus != 1 ||
+            $vitaminAStatus != 1 || $vitaminB1Status != 1 || $vitaminB2Status != 1 || $vitaminB3Status != 1 || $vitaminCStatus != 1) {
+            $ideal = 0;
+        } else { $ideal = 1;}
+        /* update ideal field in menu table if necessary */
+        if ($ideal != $menu->ideal) {
+            $menu->ideal = $ideal;
+            $menu->update();
+        }
+        /* SAVE RESULTS FROM MENU */
+        /* first check if results row exists in results table */
+        $results_data = DB::table('results')
+            ->where('id', $menu_id)
+            ->first();
+        if ($results_data) {
+            try {
+                DB::beginTransaction();
+                DB::table('results')
+                    ->where('id', $menu_id)
+                    ->update([
+                        'carbohydrates' => $caloriesinCarbohydrates,
+                        'carbohydratesStatus' => $carbohydratesStatus,
+                        'proteins' => $caloriesinProteins,
+                        'proteinsStatus' => $proteinsStatus,
+                        'lipids' => $caloriesinLipids,
+                        'lipidsStatus' => $lipidsStatus,
+                        'calcium' => $totalCalcium,
+                        'calciumStatus' => $calciumStatus,
+                        'phosphorus' => $totalPhosphorus,
+                        'phosphorusStatus' => $phosphorusStatus,
+                        'iron' => $totalIron,
+                        'ironStatus' => $ironStatus,
+                        'magnesium' => $totalMagnesium,
+                        'magnesiumStatus' => $magnesiumStatus,
+                        'sodium' => $totalSodium,
+                        'sodiumStatus' => $sodiumStatus,
+                        'potassium' => $totalPotassium,
+                        'potassiumStatus' => $potassiumStatus,
+                        'zinc' => $totalZinc,
+                        'zincStatus' => $zincStatus,
+                        'vitaminA' => $totalVitaminA,
+                        'vitaminAStatus' => $vitaminAStatus,
+                        'vitaminB1' => $totalVitaminB1,
+                        'vitaminB1Status' => $vitaminB1Status,
+                        'vitaminB2' => $totalVitaminB2,
+                        'vitaminB2Status' => $vitaminB2Status,
+                        'vitaminB3' => $totalVitaminB3,
+                        'vitaminB3Status' => $vitaminB3Status,
+                        'vitaminB6' => $totalVitaminB6,
+                        'vitaminB6Status' => $vitaminB6Status,
+                        'vitaminB9' => $totalVitaminB9,
+                        'vitaminB9Status' => $vitaminB9Status,
+                        'vitaminB12' => $totalVitaminB12,
+                        'vitaminB12Status' => $vitaminB12Status,
+                        'vitaminC' => $totalVitaminC,
+                        'vitaminCStatus' => $vitaminCStatus,
+                        'updated_at' => Carbon::now(),
+                    ]);
+            } catch (\Illuminate\Database\QueryException $ex) {
+                DB::rollback();
+            } catch (\Exception $ex) {
+                DB::rollback();
+            } finally {
+                DB::commit();
+            }
+        } else {
+            try {
+                DB::beginTransaction();
+                DB::table('results')
+                    ->insert([
+                        'id' => $menu_id,
+                        'carbohydrates' => $caloriesinCarbohydrates,
+                        'carbohydratesStatus' => $carbohydratesStatus,
+                        'proteins' => $caloriesinProteins,
+                        'proteinsStatus' => $proteinsStatus,
+                        'lipids' => $caloriesinLipids,
+                        'lipidsStatus' => $lipidsStatus,
+                        'calcium' => $totalCalcium,
+                        'calciumStatus' => $calciumStatus,
+                        'phosphorus' => $totalPhosphorus,
+                        'phosphorusStatus' => $phosphorusStatus,
+                        'iron' => $totalIron,
+                        'ironStatus' => $ironStatus,
+                        'magnesium' => $totalMagnesium,
+                        'magnesiumStatus' => $magnesiumStatus,
+                        'sodium' => $totalSodium,
+                        'sodiumStatus' => $sodiumStatus,
+                        'potassium' => $totalPotassium,
+                        'potassiumStatus' => $potassiumStatus,
+                        'zinc' => $totalZinc,
+                        'zincStatus' => $zincStatus,
+                        'vitaminA' => $totalVitaminA,
+                        'vitaminAStatus' => $vitaminAStatus,
+                        'vitaminB1' => $totalVitaminB1,
+                        'vitaminB1Status' => $vitaminB1Status,
+                        'vitaminB2' => $totalVitaminB2,
+                        'vitaminB2Status' => $vitaminB2Status,
+                        'vitaminB3' => $totalVitaminB3,
+                        'vitaminB3Status' => $vitaminB3Status,
+                        'vitaminB6' => $totalVitaminB6,
+                        'vitaminB6Status' => $vitaminB6Status,
+                        'vitaminB9' => $totalVitaminB9,
+                        'vitaminB9Status' => $vitaminB9Status,
+                        'vitaminB12' => $totalVitaminB12,
+                        'vitaminB12Status' => $vitaminB12Status,
+                        'vitaminC' => $totalVitaminC,
+                        'vitaminCStatus' => $vitaminCStatus,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                DB::commit();
+            } catch (\Illuminate\Database\QueryException $ex) {
+                DB::rollback();
+                //dd($ex);
+                $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
+                //return response()->json($msg, 400);
+            } catch (\Exception $ex) {
+                DB::rollback();
+                $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
+                //return response()->json($msg, 400);
+            }
+        }
+        /* data to display on blade */
+        $results = DB::table('results')
+            ->where('id', $menu_id)
+            ->get();
+        /* check user role */
+        if (Auth::user()->hasRole('nutritionist')) {
+            $role_id = 2;
+        } else if (Auth::user()->hasRole('patient')) {
+            $role_id = 3;
+        }
+        return view('menus.results', [
+            'menu_data' => $menu, 'patient' => $patient,
+            'results' => $results,
+            'minCaloriesInCarbohydrates' => $minCaloriesInCarbohydrates, 'maxCaloriesInCarbohydrates' => $maxCaloriesInCarbohydrates,
+            'minCaloriesInProteins' => $minCaloriesInProteins, 'maxCaloriesInProteins' => $maxCaloriesInProteins,
+            'minCaloriesInLipids' => $minCaloriesInLipids, 'maxCaloriesInLipids' => $maxCaloriesInLipids,
+            'minCalcium' => $minCalcium,
+            'minPhosphorus' => $minPhosphorus,
+            'minIron' => $minIron,
+            'minMagnesium' => $minMagnesium,
+            'minSodium' => $minSodium,
+            'minPotassium' => $minPotassium,
+            'minZinc' => $minZinc,
+            'minVitaminA' => $minVitaminA,
+            'minVitaminB1' => $minVitaminB1,
+            'minVitaminB2' => $minVitaminB2,
+            'minVitaminB3' => $minVitaminB3,
+            'minVitaminB6' => $minVitaminB6,
+            'minVitaminB9' => $minVitaminB9,
+            'minVitaminB12' => $minVitaminB12,
+            'minVitaminC' => $minVitaminC,
+            'kcal' => $sum[0]->kcal,
+            'kj' => $sum[0]->kj,
+            'water' => $sum[0]->water,
+            'cholesterol' => $sum[0]->cholesterol,
+            'dietary_fiber' => $sum[0]->dietary_fiber,
+            'minWater' => 2100,
+            'minFiber' => 25,
+            'maxCholesterol' => 300,
+            'minKcal' => 0.1 * ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)),
+            'maxKcal' => 0.1 * ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)),
+            'minKj'   => 0.1 * ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)),
+            'maxKj'   => 0.1 * ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)),
+            'role_id' => $role_id,
+        ]);
     }
-
     /**
      * List menu items
      *

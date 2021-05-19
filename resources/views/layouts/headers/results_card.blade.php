@@ -13,7 +13,7 @@
                                     @elseif($menu_data->ideal == 1)
                                         <span class="h3 font-weight-bold mb-0 text-green">{{ __('Estado') }}: {{ __('Equilibrado') }}</span>
                                     @endif
-                                    <h3 class="mb-0">{{ __('Da clic sobre cualquier renglón para ver los detalles') }}</h3>
+                                    <h3 class="mb-0 text-primary">{{ __('Da clic sobre cualquier renglón para ver los detalles') }}</h3>
                                 </div>
                                 <div class="col">
                                         <h5 class="mb-0">{{ __('Paciente') }}:

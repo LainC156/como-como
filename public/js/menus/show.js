@@ -27,12 +27,13 @@ jQuery(function () {
             url: $("#list_menu_route").val(),
             type: 'GET',
         },
-        columns: [{
-            data: 'action',
-            name: 'action',
-            searchable: false,
-            orderable: false,
-        },
+        columns: [
+        //     {
+        //     data: 'action',
+        //     name: 'action',
+        //     searchable: false,
+        //     orderable: false,
+        // },
         {
             data: 'kind_of_food',
             name: 'kind_of_food',

@@ -62,7 +62,7 @@
                                             {{ __('Editar menú') }}</a>
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
-                                            {{ __('Guardar una copia del menú') }} MV</a>
+                                            {{ __('Guardar una copia del menú') }}</a>
                                     @else
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
@@ -80,7 +80,7 @@
                                     @elseif($patient->id !== auth()->id())
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
-                                            {{ __('Guardar una copia del menú') }}NMV: {!! $patient->nutritionist_id !!}</a>
+                                            {{ __('Guardar una copia del menú') }}</a>
                                     @endif
                                 @endif
                                 <a href="{{ route('menu.results', ['id' => $menu->id]) }}" target="_blank"
@@ -103,10 +103,10 @@
                             <table id="menu_table" class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th scope="col">{{ __('Acciones') }}</th>
-                                        <th scope="col">{{ __('Nombre') }}</th>
-                                        <th scope="col">{{ __('Peso') }}</th>
+                                        <!-- <th scope="col">{{ __('Acciones') }}</th> -->
                                         <th scope="col">{{ __('Tiempo') }}</th>
+                                        <th scope="col">{{ __('Peso') }}</th>
+                                        <th scope="col">{{ __('Nombre') }}</th>
                                         <th scope="col">{{ __('KCAL') }}</th>
                                         <th scope="col">{{ __('KJ') }}</th>
                                         <th scope="col">{{ __('Agua') }}</th>
@@ -136,13 +136,10 @@
                                         <th scope="col">{{ __('Porcentaje comestible') }}</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
-
                                 </tbody>
                             </table>
                         </div> <!-- end table -->
-
                     </div>
                 </div>
             </div>
@@ -199,15 +196,15 @@
                                 <div class="form-group">
                                     <label class="form-control-label"
                                         for="">{{ __('Selecciona el usuario a quien asignar el menú actual') }}
-                                    <select id="patient_select" class="form-control">
-                                        <option disabled selected>{{ __('Selecciona un paciente') }}</option>
-                                        @forelse ($patients as $p)
-                                            <option value="{!! $p->id !!}">{{ $p->name }}
-                                                {{ $p->last_name }} ({{ $p->email }})</option>
-                                        @empty
-                                            <option disabled>{{ __('Sin opciones disponibles') }}</option>
-                                        @endforelse
-                                    </select>
+                                        <select id="patient_select" class="form-control">
+                                            <option disabled selected>{{ __('Selecciona un paciente') }}</option>
+                                            @forelse ($patients as $p)
+                                                <option value="{!! $p->id !!}">{{ $p->name }}
+                                                    {{ $p->last_name }} ({{ $p->email }})</option>
+                                            @empty
+                                                <option disabled>{{ __('Sin opciones disponibles') }}</option>
+                                            @endforelse
+                                        </select>
                                 </div>
                             </div>
                         @endif
