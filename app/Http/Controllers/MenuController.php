@@ -746,7 +746,6 @@ class MenuController extends Controller
             DB::rollback();
             $msg = ['status' => 'error', 'message' => __('Ocurrió un error, vuelve a intentarlo'), 'exception' => $ex->getMessage()];
             return response()->json($msg, 400);
-        } finally {
         }
     }
 

@@ -277,7 +277,7 @@
                                                             <td>
                                                                 <p> <span
                                                                         class="h5 font-weight-bold mb-0">{{ __('Fibra dietética') }}
-                                                                        ({{ _('gr') }}.)</span>
+                                                                        ({{ __('gr') }}.)</span>
                                                                 </p>
                                                             </td>
                                                             <td>{!! $dietary_fiber !!}</td>
