@@ -26,8 +26,8 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
         if (Auth::user()->hasRole('nutritionist')) {
-            $user = Auth::user();
             if ($user->trial_version_status) {
                 $user->expiration_date = Carbon::parse($user->createdAt)->addMonths(1);
                 return view('dashboard', ['role_id' => 2, 'user' => $user]);
@@ -40,7 +40,6 @@ class HomeController extends Controller
             }
 
         } else if (Auth::user()->hasRole('patient')) {
-            $user = auth()->user();
             $menus = Menu::where('user_id', $user->id)->count();
             if ($user->trial_version_status) {
                 $user->expiration_date = Carbon::parse($user->createdAt)->addMonths(1);
@@ -55,7 +54,7 @@ class HomeController extends Controller
                 return view('dashboard', ['role_id' => 3, 'menus' => $menus, 'user' => $user_data]);
             }
         } else if (Auth::user()->hasRole('admin')) {
-            $role_id = 1;
+            return view('dashboard', ['role_id' => 1, 'user' => $user]);
         }
     }
 }

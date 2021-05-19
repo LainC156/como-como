@@ -78,5 +78,7 @@ Route::group(['middleware' => 'auth'], function () {
         /* paypal */
     Route::get('/paypal/payment', 'PaymentController@payWithPayPal')->name('paypal.payment');
     Route::get('/status', 'PaymentController@payPalStatus')->name('paypal.status');
+        /* admin routes */
+    Route::get('/patients', 'AdministratorController@patients')->name('patients.index');
 });
 

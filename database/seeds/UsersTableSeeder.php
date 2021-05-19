@@ -1,5 +1,6 @@
 <?php
 
+use App\Administrator as Admin;
 use App\User;
 use App\Role;
 use App\Patient;
@@ -21,7 +22,7 @@ class UsersTableSeeder extends Seeder
     {
         $patient_role = Role::where('name', 'patient')->first();
         $nutritionist_role = Role::where('name', 'nutritionist')->first();
-        //$admin_role = Role::where('name', 'admin')->first();
+        $admin_role = Role::where('name', 'admin')->first();
         /* first patient */
         $user = new User();
         $user->name = 'Giovanni';
@@ -105,5 +106,33 @@ class UsersTableSeeder extends Seeder
         $user_payment->save();
         $user_payment->user()->associate($user->id);
         $user_payment->update();
+        /* admin accounts */
+        $user = new User();
+        $user->name = 'Admin 1';
+        $user->last_name = 'Account';
+        $user->email = 'admin1@comocomo.com';
+        $user->password = bcrypt('comocomo2021_1');
+        $user->account_type = '1';
+        $user->save();
+        $admin = new Admin;
+        $admin->id = $user->id;
+        $admin->user_id = $user->id;
+        $admin->save();
+        $user->roles()->attach($admin_role);
+        $user->update();
+
+        $user = new User();
+        $user->name = 'Admin 2';
+        $user->last_name = 'Account';
+        $user->email = 'admin2@comocomo.com';
+        $user->password = bcrypt('comocomo2021_2');
+        $user->account_type = '1';
+        $user->save();
+        $admin = new Admin;
+        $admin->id = $user->id;
+        $admin->user_id = $user->id;
+        $admin->save();
+        $user->roles()->attach($admin_role);
+        $user->update();
     }
 }

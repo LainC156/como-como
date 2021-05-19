@@ -1,7 +1,8 @@
 <nav class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
     <div class="container-fluid">
         <!-- Toggler -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidenav-collapse-main" aria-controls="sidenav-main" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidenav-collapse-main"
+            aria-controls="sidenav-main" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <!-- Brand -->
@@ -12,10 +13,11 @@
         <!-- User -->
         <ul class="nav align-items-center d-md-none">
             <li class="nav-item dropdown">
-                <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
                     <div class="media align-items-center">
                         <span class="avatar avatar-sm rounded-circle">
-                        <img alt="Image placeholder" src="{{ asset('img/avatar/'.auth()->user()->avatar) }}">
+                            <img alt="Image placeholder" src="{{ asset('img/avatar/' . auth()->user()->avatar) }}">
                         </span>
                     </div>
                 </a>
@@ -23,7 +25,7 @@
                     <div class=" dropdown-header noti-title">
                         <h6 class="text-overflow m-0">{{ __('¡Bienvenido!') }}</h6>
                     </div>
-                    <a href="{{ route('profile.edit',auth()->user()->id) }}" class="dropdown-item">
+                    <a href="{{ route('profile.edit', auth()->user()->id) }}" class="dropdown-item">
                         <i class="ni ni-single-02"></i>
                         <span>{{ __('Mi perfil') }}</span>
                     </a>
@@ -62,7 +64,9 @@
                     </div>
                     <div class="col-6 collapse-close">
                         <span class="text-primary">{{ __('¿Cómo como?') }}</span>
-                        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#sidenav-collapse-main" aria-controls="sidenav-main" aria-expanded="false" aria-label="Toggle sidenav">
+                        <button type="button" class="navbar-toggler" data-toggle="collapse"
+                            data-target="#sidenav-collapse-main" aria-controls="sidenav-main" aria-expanded="false"
+                            aria-label="Toggle sidenav">
                             <span></span>
                             <span></span>
                         </button>
@@ -88,58 +92,84 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#navbar-examples" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="navbar-examples">
+                    <a class="nav-link active" href="#navbar-examples" data-toggle="collapse" role="button"
+                        aria-expanded="true" aria-controls="navbar-examples">
                         <i class="ni ni-circle-08" style="color: #f4645f;"></i>
-                        @if( $role_id == 2 )
-                        <span class="nav-link-text" style="color: #f4645f;">{{ __('Pacientes') }}</span>
+                        @if ($role_id == 2)
+                            <span class="nav-link-text" style="color: #f4645f;">{{ __('Pacientes') }}</span>
                         @elseif( $role_id == 1 )
-                        <span class="nav-lin-text" style="color:#f4645f;">{{ __('Usuarios') }}</span>
+                            <span class="nav-lin-text" style="color:#f4645f;">{{ __('Usuarios') }}</span>
                         @elseif( $role_id == 3 )
-                        <span class="nav-link-text" style="color: #f4645f;">{{ __('Datos') }}</span>
+                            <span class="nav-link-text" style="color: #f4645f;">{{ __('Datos') }}</span>
                         @endif
                     </a>
                     <div class="collapse show" id="navbar-examples">
                         <ul class="nav nav-sm flex-column">
-                    @if( $role_id == 2 )
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('user.create') }}">
-                                <i class="fa fa-user-plus" aria-hidden="true">
-                                @if( $role_id == 2 )
-                                    <span class="nav-link-text">{{ __('Nuevo paciente') }}</span>
-                                @elseif( $role_id == 1 )
-                                    <span class="nav-link-text">{{ __('Nuevo usuario') }}</span>
-                                @endif
-                                </i>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-link" href="{{ route('user.index') }}">
-                                <i class="fa fa-users" aria-hidden="true">
-                                @if( $role_id == 2 )
-                                    <span class="nav-link-text">{{ __('Pacientes registrados') }}</span>
-                                @elseif( $role_id == 1 )
-                                    <span class="nav-link-text">{{ __('Usuarios registrados') }}</span>
-                                @endif
-                                </i>
-                            </a>
-                        </li>
-                    @endif
-                            @if( $role_id == 3 )
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('menu.create', auth()->user()->id) }}">
-                                    <i class="ni ni-folder-17" aria-hidden="true">
-                                        <span class="nav-link-text">{{ __('Menú nuevo') }}</span>
-                                    </i>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('menu.index', auth()->user()->id) }}">
-                                    <i class="ni ni-single-copy-04" aria-hidden="true">
-                                        <span class="nav-link-text">{{ __('Mis menús') }}</span>
-                                    </i>
-                                </a>
-                            </li>
+                            @if ($role_id == 2)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('user.create') }}">
+                                        <i class="fa fa-user-plus" aria-hidden="true">
+                                            @if ($role_id == 2)
+                                                <span class="nav-link-text">{{ __('Nuevo paciente') }}</span>
+                                            @elseif( $role_id == 1 )
+                                                <span class="nav-link-text">{{ __('Nuevo usuario') }}</span>
+                                            @endif
+                                        </i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link" href="{{ route('user.index') }}">
+                                        <i class="fa fa-users" aria-hidden="true">
+                                            @if ($role_id == 2)
+                                                <span class="nav-link-text">{{ __('Pacientes registrados') }}</span>
+                                            @elseif( $role_id == 1 )
+                                                <span class="nav-link-text">{{ __('Usuarios registrados') }}</span>
+                                            @endif
+                                        </i>
+                                    </a>
+                                </li>
                             @endif
+                            @if ($role_id == 3)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('menu.create', auth()->user()->id) }}">
+                                        <i class="ni ni-folder-17" aria-hidden="true">
+                                            <span class="nav-link-text">{{ __('Menú nuevo') }}</span>
+                                        </i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('menu.index', auth()->user()->id) }}">
+                                        <i class="ni ni-single-copy-04" aria-hidden="true">
+                                            <span class="nav-link-text">{{ __('Mis menús') }}</span>
+                                        </i>
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($role_id == 1)
+                                <!-- admin routes -->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">
+                                        <i class="ni ni-folder-17" aria-hidden="true">
+                                            <span class="nav-link-text">{{ __('Pacientes') }}</span>
+                                        </i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">
+                                        <i class="ni ni-single-copy-04" aria-hidden="true">
+                                            <span class="nav-link-text">{{ __('Nutriólogos') }}</span>
+                                        </i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="">
+                                        <i class="ni ni-single-copy-04" aria-hidden="true">
+                                            <span class="nav-link-text">{{ __('Generador de códigos') }}</span>
+                                        </i>
+                                    </a>
+                                </li>
+                            @endif
+                            @if($role_id !== 1)
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile.edit', auth()->user()->id) }}">
                                     <i class="fa fa-user" aria-hidden="true">
@@ -147,26 +177,28 @@
                                     </i>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </div>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('menu.search') }}">
-                            <i class="ni ni-planet text-blue"></i> {{ __('Buscar menús') }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('social.index') }}">
-                            <i class="ni ni-like-2 text-blue">
-                            </i>
-                            {{ __('Social') }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
+                    @if ($role_id !== 1)
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('menu.search') }}">
+                                <i class="ni ni-planet text-blue"></i> {{ __('Buscar menús') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('social.index') }}">
+                                <i class="ni ni-like-2 text-blue">
+                                </i>
+                                {{ __('Social') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('payment.index') }}">
                                 <i class="ni ni-credit-card text-red"></i> {{ __('Suscripción') }}
                             </a>
                         </li>
+                    @endif
                 </li>
 
 

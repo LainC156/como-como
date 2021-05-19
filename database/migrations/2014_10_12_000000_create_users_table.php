@@ -9,7 +9,7 @@ class CreateUsersTable extends Migration
     /**
      * Run the migrations.
      * identificator: CURP/ID
-     * account type: 0 = patient, 1 = nutriologist, 2 = administrator
+     * account type: 3 = patient, 2 = nutritionist, 1 = administrator
      * subscription_status: 0 = account activated, 1 = account disabled
      * trial_version_status: 0 = expired, 1 = activated
      *

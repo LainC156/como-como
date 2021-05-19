@@ -3,7 +3,7 @@
         <div class="header-body">
             <!-- Card stats -->
             <div class="row">
-                @if ($user->subscription_status || $user->trial_version_status)
+                @if (($user->subscription_status || $user->trial_version_status) && $role_id !== 1)
                     <div class="col-xl-3 col-lg-6">
                         <div class="card card-stats mb-4 mb-xl-0">
                             <div class="card-body">
@@ -28,7 +28,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                @if (($user->subscription_status == 1 && !$user->nutritionist_id) || ($user->trial_version_status && $role_id == 2) || ( $user->trial_version_status && !$user->nutritionist_id))
+                                @if (($user->subscription_status == 1 && !$user->nutritionist_id) || ($user->trial_version_status && $role_id == 2) || ($user->trial_version_status && !$user->nutritionist_id))
                                     <p class="mt-3 mb-0 text-muted text-sm">
                                         <span class="text-success mr-2"><i class="fa fa-arrow-up"></i>
                                             {{ __('Cuenta activa hasta') }}:</span>

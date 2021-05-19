@@ -662,10 +662,10 @@ class MenuController extends Controller
             'minWater' => 2100,
             'minFiber' => 25,
             'maxCholesterol' => 300,
-            'minKcal' => 0.1 * ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)),
-            'maxKcal' => 0.1 * ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)),
-            'minKj'   => 0.1 * ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)),
-            'maxKj'   => 0.1 * ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)),
+            'minKcal' => $patient->caloric_requirement - ($patient->caloric_requirement * 0.1),
+            'maxKcal' => $patient->caloric_requirement + ($patient->caloric_requirement * 0.1),
+            'minKj'   => ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)) * 4.1868,
+            'maxKj'   => ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)) * 4.1868,
             'role_id' => $role_id,
         ]);
     }
