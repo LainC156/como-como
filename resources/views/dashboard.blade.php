@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@section('title')
+    {{ __('Inicio') }} | {{ __('¿Cómo como?') }}
+@endsection
 @section('content')
     @include('layouts.headers.cards')
 

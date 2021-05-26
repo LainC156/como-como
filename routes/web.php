@@ -80,5 +80,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/status', 'PaymentController@payPalStatus')->name('paypal.status');
         /* admin routes */
     Route::get('/patients', 'AdministratorController@patients')->name('patients.index');
+    Route::get('/nutritionists', 'AdministratorController@nutritionists')->name('nutritionists.index');
+    Route::post('/updateuserasadmin', 'AdministratorController@update')->name('user.update.asadmin');
+    Route::get('/coupons', 'CouponController@index')->name('coupon.index');
+    Route::post('/createcoupon', 'CouponController@store')->name('coupon.store');
+    Route::post('/sendcoupon', 'CouponController@send')->name('coupon.send');
+    Route::get('/activatecoupon/{coupon_code}', 'CouponController@activate')->name('coupon.activate');
 });
 

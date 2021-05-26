@@ -90,7 +90,7 @@ class PaymentController extends Controller
                 DB::beginTransaction();
                 $data = new PM();
                 $data->user_id = $auth->id;
-                $data->trial_status = 0;
+                //$data->trial_status = 0;
                 $data->active = 0;
                 $data->payment_status = 'pending';
                 $data->payment_method = 'PayPal';

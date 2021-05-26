@@ -35,6 +35,7 @@ class HomeController extends Controller
             if (!$user->trial_version_status && $user->subscription_status) {
                 $user_data = User::where('users.id', $user->id)
                     ->join('payments as p', 'p.user_id', '=', 'users.id')
+                    ->where('p.active', 1)
                     ->first();
                 return view('dashboard', ['role_id' => 2, 'user' => $user_data]);
             }
@@ -48,6 +49,7 @@ class HomeController extends Controller
             if (!$user->trial_version_status && $user->subscription_status) {
                 $user_data = User::where('users.id', $user->id)
                     ->leftJoin('payments as p', 'p.user_id', '=', 'users.id')
+                    ->where('p.active', 1)
                     ->join('patients as pa', 'pa.user_id', '=', 'users.id')
                     ->orderBy('p.id', 'desc')
                     ->first();

@@ -9,7 +9,8 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ __('¿Cómo como?') }}</title>
+    <!-- <title>{{ __('¿Cómo como?') }}</title> -->
+    <title>@yield('title')</title>
     <!-- Favicon -->
     <link href="/argon/img/brand/favicon1.png" rel="icon" type="image/png">
     <!-- Fonts -->

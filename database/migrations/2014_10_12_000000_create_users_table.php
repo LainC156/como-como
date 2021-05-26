@@ -27,8 +27,8 @@ class CreateUsersTable extends Migration
             $table->string('password')->nullable();
             $table->string('avatar')->default('user.jpg');
             $table->integer('account_type')->nullable();
-            $table->boolean('subscription_status')->default(0);
-            $table->boolean('trial_version_status')->default(1);
+            $table->boolean('subscription_status')->default(false);
+            $table->boolean('trial_version_status')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

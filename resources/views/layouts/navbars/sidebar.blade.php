@@ -148,23 +148,23 @@
                             @if ($role_id == 1)
                                 <!-- admin routes -->
                                 <li class="nav-item">
-                                    <a class="nav-link" href="">
+                                    <a class="nav-link" href="{{ route('patients.index') }}">
                                         <i class="ni ni-folder-17" aria-hidden="true">
                                             <span class="nav-link-text">{{ __('Pacientes') }}</span>
                                         </i>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="">
+                                    <a class="nav-link" href="{{ route('nutritionists.index') }}">
                                         <i class="ni ni-single-copy-04" aria-hidden="true">
                                             <span class="nav-link-text">{{ __('Nutriólogos') }}</span>
                                         </i>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="">
+                                    <a class="nav-link" href="{{ route('coupon.index') }}">
                                         <i class="ni ni-single-copy-04" aria-hidden="true">
-                                            <span class="nav-link-text">{{ __('Generador de códigos') }}</span>
+                                            <span class="nav-link-text">{{ __('Generador de códigos/cupones') }}</span>
                                         </i>
                                     </a>
                                 </li>
@@ -196,6 +196,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('payment.index') }}">
                                 <i class="ni ni-credit-card text-red"></i> {{ __('Suscripción') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('coupon.index') }}">
+                                <i class="ni ni-credit-card text-red"></i> {{ __('Cupones') }}
                             </a>
                         </li>
                     @endif

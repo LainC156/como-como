@@ -1,4 +1,4 @@
-$(document).ready(function() {
+jQuery(function() {
     /* csrf token to ajax requests configuration */
     $.ajaxSetup({
         headers: {

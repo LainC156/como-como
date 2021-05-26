@@ -18,7 +18,7 @@ class CreatePaymentsTable extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->integer('trial_status')->default(1);
+            //$table->integer('trial_status')->default(1);
             $table->integer('active')->default(0);
             $table->string('payment_status')->nullable();
             $table->string('recurring_id')->nullable();
