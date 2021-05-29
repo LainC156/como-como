@@ -1,7 +1,9 @@
 @extends('layouts.app', ['title' => __('User Management')])
-
+@section('title')
+    {{ __('Pacientes') }} | {{ __('¿Cómo como?') }}
+@endsection
 @section('content')
-    @include('layouts.headers.cards')
+    @include('users.partials.header', ['title' => __('Pacientes')])
 
     <div class="container-fluid mt--7">
         <div class="row">
@@ -13,15 +15,14 @@
                                 <h3 class="mb-0">{{ __('Pacientes') }}</h3>
                             </div>
                             <div class="col-4 text-right">
-                                <a href="{{ route('user.create') }}" class="btn btn-sm btn-primary">{{ __('Nuevo paciente') }}</a>
+                                <a href="{{ route('user.create') }}" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-user-plus"></i> {{ __('Nuevo paciente') }}</a>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12">
                         @include('helpers.session_status')
                     </div>
-
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
@@ -35,31 +36,38 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($patients as $user)
+                                @forelse ($patients as $patient)
                                     <tr>
                                         <td>
-                                            <form action="{{ route('user.destroy', $user->id) }}" method="post">
+                                            <form action="{{ route('user.destroy', $patient->id) }}" method="post">
                                                 @csrf
-                                            <a class="btn btn-primary btn-sm" href="{{ route('menu.create', [$user->id]) }}" target="_blank">
-                                                <i class="ni ni-fat-add"></i>{{ __('Crear menú') }}
-                                            </a>
-                                            <a class="btn btn-info btn-sm" href="{{ route('menu.index', [$user->id]) }}" target="_blank"><i class="ni ni-archive-2"></i> {{ __('Ver menus') }}</a>
-                                            <a class="btn btn-default btn-sm" href="{{ route('user.edit', [$user->id]) }}" target="_blank">
-                                                <i class="far fa-edit"> {{ __('Editar') }} </i>
-                                            </a>
-                                            <a class="btn btn-warning btn-sm" onclick="confirm('{{ __("¿Estás seguro que quieres borrar este usuario? Esta acción no se puede deshacer.") }}') ? this.parentElement.submit() : ''">
-                                                <i class="far fa-trash-alt">{{ __('Borrar') }}</i>
-                                            </a>
-                                        </form>
+                                                <a class="btn btn-primary btn-sm"
+                                                    href="{{ route('menu.create', [$patient->id]) }}" target="_blank">
+                                                    <i class="ni ni-fat-add"></i>{{ __('Crear menú') }}
+                                                </a>
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('menu.index', [$patient->id]) }}" target="_blank"><i
+                                                        class="ni ni-archive-2"></i> {{ __('Ver menus') }}</a>
+                                                <a class="btn btn-default btn-sm"
+                                                    href="{{ route('user.edit', [$patient->id]) }}" target="_blank">
+                                                    <i class="far fa-edit"> {{ __('Editar') }} </i>
+                                                </a>
+                                                <a class="btn btn-warning btn-sm"
+                                                    onclick="confirm('{{ __('¿Estás seguro que quieres borrar este usuario? Esta acción no se puede deshacer.') }}') ? this.parentElement.submit() : ''">
+                                                    <i class="far fa-trash-alt">{{ __('Borrar') }}</i>
+                                                </a>
+                                            </form>
                                         </td>
-                                        <td>{{ $user->name }}</td>
-                                        <td>{!! $user->last_name !!}</td>
+                                        <td>{{ $patient->name }}</td>
+                                        <td>{!! $patient->last_name !!}</td>
                                         <td>
-                                            <a href="mailto:{{ $user->email }}">{{ $user->email }}</a>
+                                            <a href="mailto:{{ $patient->email }}">{{ $patient->email }}</a>
                                         </td>
-                                        <td>{!! $user->identificator!!}</td>
+                                        <td>{!! $patient->identificator !!}</td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <td class="text-center">{{ __('Sin pacientes registrados') }}</td>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -70,11 +78,10 @@
                 </div>
             </div>
         </div>
-
         @include('layouts.footers.auth')
     </div>
 @endsection
 @section('javascript')
-    <script src="{{ asset('js/user_index.js') }}"></script>
-    <script src="{{ asset('js/alerts.js') }}"></script>
+<script src="{{ asset('js/user/index.js') }}"></script>
+<script src="{{ asset('js/alerts.js') }}"></script>
 @endsection

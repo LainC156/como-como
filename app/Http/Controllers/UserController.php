@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Http\Requests\UserRequest;
 use App\Mail\RegisterMail as RegisterMail;
 use App\Patient;
 use App\User;
-use App\Role;
-use App\Http\Requests\UserRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
@@ -24,20 +22,15 @@ class UserController extends Controller
      */
     public function index(User $model)
     {
-        if( Auth::user()->hasRole('nutritionist')) {
-            //$auth = Auth::user();
-
-            $user=  User::where('users.id', auth()->id())
-                    ->leftJoin('payments as p','p.user_id', '=', 'users.id')
-                    ->first();
-            //dd($user);
+        if (Auth::user()->hasRole('nutritionist')) {
             $patients = Patient::where('patients.nutritionist_id', auth()->id())
-                        ->join('users as u', 'u.id', '=', 'patients.user_id')
-                        ->get();
-            //dd($patients);
+                ->join('users as u', 'u.id', '=', 'patients.user_id')
+                ->get();
             $role_id = 2;
+            return view('users.index', ['patients' => $patients, 'role_id' => $role_id]);
+        } else {
+            abort(403);
         }
-        return view('users.index', ['user' => $user,'patients' => $patients, 'role_id' => $role_id]);
     }
 
     /**
@@ -47,89 +40,88 @@ class UserController extends Controller
      */
     public function create()
     {
-        if( Auth::user()->hasRole('nutritionist')) {
-            $user = Auth::user()
-                    ->join('payments as p','p.user_id', '=', 'users.id')
-                    ->first();
+        if (Auth::user()->hasRole('nutritionist')) {
             $role_id = 2;
+            return view('users.create', ['role_id' => $role_id]);
+        } else {
+            abort(403);
         }
-        return view('users.create', ['user' => $user, 'role_id' => $role_id]);
     }
 
     /**
-     * Store a newly created user in storage
+     * Create new pending user register, created pending user must activate account via email
      *
      * @param  \App\Http\Requests\UserRequest  $request
      * @param  \App\User  $model
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request) {
-                $name = $request['name'];
-                $last_name = $request['last_name'];
-                $identificator = $request['identificator'];
-                $email = $request['email'];
-                $password = $request['password'];
-                $password_confirmation = $request['password_confirmation'];
-                $weight = $request['weight'];
-                $height = $request['height'];
-                $birthdate = $request['birthdate'];
-                $genre = $request['genre'];
-                $psychical_activity = $request['psychical_activity'];
-                $waist_size = $request['waist_size'];
-                $legs_size = $request['legs_size'];
-                $wrist_size = $request['wrist_size'];
-                if( $request['automatic_calculation'] == 1) {
-                    $caloric_requirement = $this->getCaloricRequirement($weight, $height, $birthdate, $genre, $psychical_activity);
-                } else if( $request['automatic_calculation'] == 0){
-                    $caloric_requirement = $request['caloric_requirement'];
-                }
+    public function store(Request $request)
+    {
+        $name = $request['name'];
+        $last_name = $request['last_name'];
+        $identificator = $request['identificator'];
+        $email = $request['email'];
+        $password = $request['password'];
+        $password_confirmation = $request['password_confirmation'];
+        $weight = $request['weight'];
+        $height = $request['height'];
+        $birthdate = $request['birthdate'];
+        $genre = $request['genre'];
+        $psychical_activity = $request['psychical_activity'];
+        $waist_size = $request['waist_size'];
+        $legs_size = $request['legs_size'];
+        $wrist_size = $request['wrist_size'];
+        $automatic_calculation = $request['automatic_calculation'];
+        if ($automatic_calculation === true) {
+            $caloric_requirement = $this->getCaloricRequirement($weight, $height, $birthdate, $genre, $psychical_activity);
+        } else if ($automatic_calculation === false) {
+            $caloric_requirement = $request['caloric_requirement'];
+        }
 
-                if( $password != $password_confirmation ) {
-                    return response()->json( ['status' => 'error', 'message' => __('Las contraseñas no coinciden, verifica la información')] );
-                }
-                /* token to activate account */
-                $token = bin2hex(random_bytes(70));
-                try {
-                    DB::beginTransaction();
-                    DB::table('pending_users')->insert([
-                        'name' => $name,
-                        'last_name' => $last_name,
-                        'birthdate' => $birthdate,
-                        'identificator' => $identificator,
-                        'email' => $email,
-                        'password' => bcrypt($password),
-                        'account_type' => 3,
-                        'nutritionist_id' => auth()->id(),
-                        'weight' => $weight,
-                        'height' => $height,
-                        'genre' => $genre,
-                        'psychical_activity' => $psychical_activity,
-                        'caloric_requirement' => $caloric_requirement,
-                        'waist_size' => $waist_size,
-                        'legs_size' => $legs_size,
-                        'wrist_size' => $wrist_size,
-                        'token' => $token,
-                    ]);
-                    /* email to activate account */
-                    $registerObj = new \StdClass();
-                    $registerObj->token = $token;
-                    $registerObj->name = $name." ".$last_name;
-                    $registerObj->password = $password;
-                    Mail::to($email)->send(new RegisterMail($registerObj));
-                    DB::commit();
-                    return response()->json(['status' => 'success', 'message' => __('El paciente debe activar la cuenta para poder visualizar su perfil en el sistema')]);
-                }catch(\Illuminate\Database\QueryException $ex){
-                    DB::rollback();
-                    $message = __('Ocurrió un error, vuelve a intentarlo');
-                    dd($ex);
-                    return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
-                }
-                catch(\Exception $ex){
-                    DB::rollback();
-                    $message = __('Ocurrió un error, vuelve a intentarlo');
-                    dd($ex);
-                    return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
-                }
+        if ($password != $password_confirmation) {
+            return response()->json(['status' => 'error', 'message' => __('Las contraseñas no coinciden, verifica la información')]);
+        }
+        /* token to activate account */
+        $token = bin2hex(random_bytes(70));
+        try {
+            DB::beginTransaction();
+            DB::table('pending_users')->insert([
+                'name' => $name,
+                'last_name' => $last_name,
+                'birthdate' => $birthdate,
+                'identificator' => $identificator,
+                'email' => $email,
+                'password' => bcrypt($password),
+                'account_type' => 3,
+                'nutritionist_id' => auth()->id(),
+                'weight' => $weight,
+                'height' => $height,
+                'genre' => $genre,
+                'psychical_activity' => $psychical_activity,
+                'caloric_requirement' => $caloric_requirement,
+                'waist_size' => $waist_size,
+                'legs_size' => $legs_size,
+                'wrist_size' => $wrist_size,
+                'acrc' => $automatic_calculation,
+                'token' => $token,
+            ]);
+            /* email to activate account */
+            $registerObj = new \StdClass();
+            $registerObj->token = $token;
+            $registerObj->name = $name . " " . $last_name;
+            $registerObj->password = $password;
+            Mail::to($email)->send(new RegisterMail($registerObj));
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => __('El paciente debe activar la cuenta para poder visualizar su perfil en el sistema')]);
+        } catch (\Illuminate\Database\QueryException $ex) {
+            DB::rollback();
+            $message = __('Ocurrió un error, vuelve a intentarlo');
+            return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
+        } catch (\Exception $ex) {
+            DB::rollback();
+            $message = __('Ocurrió un error, vuelve a intentarlo');
+            return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
+        }
     }
 
     /**
@@ -140,15 +132,17 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        if( Auth::user()->hasRole('nutritionist')) {
+        if (Auth::user()->hasRole('nutritionist')) {
             $patient = User::where('users.id', $id)
-                        ->join('patients as p', 'p.user_id', '=', 'users.id')
-                        ->first();
-                        if(!$patient) {
-                            abort(404);
-                        }
-            $role_id = 2;
-            return view('users.edit', ['patient' => $patient, 'role_id' => $role_id]);
+                ->where('p.nutritionist_id', auth()->user()->id)
+                ->join('patients as p', 'p.user_id', '=', 'users.id')
+                ->first();
+            if (!$patient) {
+                abort(404);
+            }
+            return view('users.edit', ['patient' => $patient, 'role_id' => 2]);
+        } else {
+            abort(403);
         }
     }
 
@@ -161,7 +155,7 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        if(Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')){
+        if (Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')) {
             $patient_id = $request['patient_id'];
             $name = $request['name'];
             $last_name = $request['last_name'];
@@ -177,16 +171,15 @@ class UserController extends Controller
             $waist_size = $request['waist_size'];
             $legs_size = $request['legs_size'];
             $wrist_size = $request['wrist_size'];
-
+            $automatic_calculation = $request['automatic_calculation'];
+            $caloric_requirement = $request['caloric_requirement'];
+            //dd($weight, $height, $birthdate, $genre, $psychical_activity);
             /* validate changes in password */
-            if( $request['automatic_calculation'] == 1) {
+            if ($automatic_calculation === "true") {
                 $caloric_requirement = $this->getCaloricRequirement($weight, $height, $birthdate, $genre, $psychical_activity);
-            } else if( $request['automatic_calculation'] == 0){
-                $caloric_requirement = $request['caloric_requirement'];
             }
-
-            if( $password != $password_confirmation ) {
-                return response()->json( ['status' => 'error', 'message' => __('Las contraseñas no coinciden, verifica la información')] );
+            if ($password != $password_confirmation) {
+                return response()->json(['status' => 'error', 'message' => __('Las contraseñas no coinciden, verifica la información')]);
             }
 
             try {
@@ -196,34 +189,33 @@ class UserController extends Controller
                 $user->last_name = $last_name;
                 $user->identificator = $identificator;
                 $user->email = $email;
-                if($password){
+                if ($password) {
                     $user->password = bcrypt($password);
                 }
                 $user->save();
 
                 Patient::where('user_id', $patient_id)
-                ->update([
-                    'weight' => $weight,
-                    'height' => $height,
-                    'birthdate' => $birthdate,
-                    'genre' => $genre,
-                    'psychical_activity' => $psychical_activity,
-                    'caloric_requirement' => $caloric_requirement,
-                    'waist_size' => $waist_size,
-                    'legs_size' => $legs_size,
-                    'wrist_size' => $wrist_size
-                ]);
+                    ->update([
+                        'weight' => $weight,
+                        'height' => $height,
+                        'birthdate' => $birthdate,
+                        'genre' => $genre,
+                        'psychical_activity' => $psychical_activity,
+                        'caloric_requirement' => $caloric_requirement,
+                        'waist_size' => $waist_size,
+                        'legs_size' => $legs_size,
+                        'wrist_size' => $wrist_size,
+                        'acrc' => $automatic_calculation,
+                    ]);
                 DB::commit();
                 return response()->json(['status' => 'success', 'message' => __('Datos actualizados correctamente, la página se actualizará automáticamente')]);
-            }catch(\Illuminate\Database\QueryException $ex){
+            } catch (\Illuminate\Database\QueryException $ex) {
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
-            }
-            catch(\Exception $ex){
+            } catch (\Exception $ex) {
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo');
-                //dd($ex);
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
             }
         }
@@ -238,17 +230,16 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if( Auth::user() ){
+        if (Auth::user()) {
             try {
                 DB::beginTransaction();
                 User::where('id', $id)->delete();
                 DB::commit();
                 return redirect()->route('user.index')->with('success', __('Usuario borrado con éxito'));
-            }catch(\Illuminate\Database\QueryException $ex){
+            } catch (\Illuminate\Database\QueryException $ex) {
                 DB::rollback();
                 return redirect()->route('user.index')->with('error', __('Ocurrió un error, vuelve a intentarlo'));
-            }
-            catch(\Exception $ex){
+            } catch (\Exception $ex) {
                 DB::rollback();
                 return redirect()->route('user.index')->with('error', __('Ocurrió un error, vuelve a intentarlo'));
             }
@@ -260,20 +251,21 @@ class UserController extends Controller
      * Update avatar image profile
      *
      */
-    public function updateAvatar(Request $request, $id) {
-        if(Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')){
+    public function updateAvatar(Request $request, $id)
+    {
+        if (Auth::user()->hasRole('nutritionist') || Auth::user()->hasRole('patient')) {
             /* validate image width, height */
             $val = $this->validate($request, [
-                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg,dimensions:max_width:700,max_height:500'
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg,dimensions:max_width:700,max_height:500',
             ]);
             // if($request->hasFile('avatar')){
             //     dd($request['patient_id']);
             // }
-            if(!$val){
+            if (!$val) {
                 return response()->json(['status' => 'error', 'message' => __('El archivo seleccionado no es válido, prueba con una imagen de 700x500 pixeles máximo')]);
             }
             $user = User::find($id);
-            $avatarName = $user->id.'_avatar.'.request()->avatar->getClientOriginalExtension();
+            $avatarName = $user->id . '_avatar.' . request()->avatar->getClientOriginalExtension();
             $request->avatar->storeAs('img/avatar', $avatarName);
             try {
                 DB::beginTransaction();
@@ -281,12 +273,11 @@ class UserController extends Controller
                 $user->save();
                 DB::commit();
                 return response()->json(['status' => 'success', 'message' => __('Foto de perfil actualizada correctamente')]);
-            }catch(\Illuminate\Database\QueryException $ex){
+            } catch (\Illuminate\Database\QueryException $ex) {
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
-            }
-            catch(\Exception $ex){
+            } catch (\Exception $ex) {
                 DB::rollback();
                 $message = __('Ocurrió un error, vuelve a intentarlo2');
                 return response()->json(['status' => 'error', 'message' => $message, 'exception' => $ex->getMessage()]);
@@ -317,23 +308,28 @@ class UserController extends Controller
      * GAST ENERGÉTICO TOTAL (GET):
      * GET = ETA + GAF;
      */
-    public function getCaloricRequirement($weight, $height, $birthdate, $genre, $psychical_activity) {
+    public function getCaloricRequirement($weight, $height, $birthdate, $genre, $psychical_activity)
+    {
         /* calculate age with birthdate */
         $age = Carbon::parse($birthdate)->age;
         /* genre: WOMAN = 1, MAN = 0*/
-        if( $genre == 1) $dif = -161;
-        else $dif = 5;
+        if ($genre == 1) {
+            $dif = -161;
+        } else {
+            $dif = 5;
+        }
+
         //$dif = ($genre == 1) : -161 ? 5;
         $GEB = (10 * $weight) + (6.25 * $height) - (5 * $age) + $dif;
         $ETA = $GEB * 0.10;
-        switch ( $psychical_activity ) {
+        switch ($psychical_activity) {
             case '0':
                 $FAF = 0;
                 break;
             case '1':
-                if($genre == 0){
+                if ($genre == 0) {
                     $FAF = 0.14;
-                } else if($genre == 1){
+                } else if ($genre == 1) {
                     $FAF = 0.12;
                 }
                 break;

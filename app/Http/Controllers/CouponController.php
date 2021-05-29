@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Coupon;
+use App\Patient;
 use App\Payment;
 use App\User;
 use Auth;
@@ -41,6 +42,12 @@ class CouponController extends Controller
             return view('coupons.index', ['role_id' => 1, 'coupons' => $coupons, 'nutritionists' => $nutritionists, 'patients' => $patients]);
         } else if (Auth::user()->hasRole('nutritionist')) {
             return view('coupons.index', ['role_id' => 2]);
+        } else if (Auth::user()->hasRole('patient')) {
+            $patient = Patient::where('user_id', auth()->user()->id)->first();
+            if ($patient->nutritionist_id !== null) {
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Cupones'));
+            }
+            return view('coupons.index', ['role_id' => 3]);
         }
     }
 
@@ -187,7 +194,7 @@ class CouponController extends Controller
             if (!$coupon) {
                 $message = __('Este cupón no existe, contacta al administrador para mayor información');
                 return redirect()->route('home')->with('error', $message);
-                }
+            }
             if ($coupon->used) {
                 $message = __('Este cupón no es válido, ya ha sido activado anteriormente');
                 return redirect()->route('home')->with('error', $message);

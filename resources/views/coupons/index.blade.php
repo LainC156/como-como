@@ -1,6 +1,6 @@
-@extends('layouts.app', ['title' => __('Creador de cupones')])
+@extends('layouts.app')
 @section('title')
-    {{ __('Generador de cupones') }} | {{ __('¿Cómo como?') }}
+    {{ __('Cupones') }} | {{ __('¿Cómo como?') }}
 @endsection
 @section('content')
     @include('users.partials.header', ['title' => __('Generador de cupones')])
@@ -64,7 +64,7 @@
                                 </button>
                                 <div class="col">
                                     <a hidden id="activate_coupon_btn" class="btn btn-primary"
-                                    type="button">{{ __('Activar cupón') }}</a>
+                                        type="button">{{ __('Activar cupón') }}</a>
                                     <button id="verify_coupon_btn" class="btn btn-primary"
                                         type="button">{{ __('Verificar cupón') }}</button>
                                 </div>
@@ -74,12 +74,12 @@
                 </div>
             </div>
         </div>
+        @if ($role_id === 1)
+            @include('helpers.admin.createCoupon')
+            @include('helpers.admin.assignCoupon')
+        @endif
+        @include('layouts.footers.auth')
     </div>
-    @if ($role_id === 1)
-        @include('helpers.admin.createCoupon')
-        @include('helpers.admin.assignCoupon')
-    @endif
-    @include('layouts.footers.auth')
 @endsection
 @section('javascript')
     <script src="{{ asset('js/coupon/index.js') }}"></script>

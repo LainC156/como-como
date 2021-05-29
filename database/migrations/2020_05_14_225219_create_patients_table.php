@@ -8,6 +8,7 @@ class CreatePatientsTable extends Migration
 {
     /**
      * Run the migrations.
+     * acrc = automatic caloric requirement calculation
      *
      * @return void
      */
@@ -24,6 +25,7 @@ class CreatePatientsTable extends Migration
             $table->string('genre')->nullable();
             $table->string('psychical_activity')->nullable();
             $table->string('caloric_requirement')->nullable();
+            $table->boolean('acrc')->default(true);
             $table->string('waist_size')->nullable();
             $table->string('legs_size')->nullable();
             $table->string('wrist_size')->nullable();

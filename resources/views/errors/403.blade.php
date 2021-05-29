@@ -22,6 +22,7 @@
             <a href="{{ route('home') }}">Regresar a inicio</a>
         </div>
     </div>
+    @include('layouts.footers.auth')
 </body>
 
 </html>

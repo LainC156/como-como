@@ -201,6 +201,7 @@ class RegisterController extends Controller
                 $patient->genre = $pending_user->genre;
                 $patient->psychical_activity = $pending_user->psychical_activity;
                 $patient->caloric_requirement = $pending_user->caloric_requirement;
+                $patient->acrc = $pending_user->acrc;
                 $patient->waist_size = $user->pending_waist_size;
                 $patient->legs_size = $user->pending_legs_size;
                 $patient->wrist_size = $user->pending_wrist_size;

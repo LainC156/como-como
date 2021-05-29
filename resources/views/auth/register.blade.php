@@ -1,5 +1,7 @@
 @extends('layouts.app', ['class' => 'bg-default'])
-
+@section('title')
+    {{ __('Registro') }} | {{ __('¿Cómo como?') }}
+@endsection
 @section('content')
     @include('layouts.headers.guest')
 
@@ -15,7 +17,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
                                 </div>
-                                <input class="form-control" placeholder="{{ __('Nombre') }}" type="text" name="name" id="registration_name" value="" autofocus required>
+                                <input class="form-control" placeholder="{{ __('Nombre') }}" type="text" name="name"
+                                    id="registration_name" value="" autofocus required>
                             </div>
                         </div>
                         <!-- LAST NAME -->
@@ -24,7 +27,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
                                 </div>
-                                <input class="form-control" placeholder="{{ __('Apellidos') }}" type="text" name="last_name" id="registration_last_name" value="" autofocus>
+                                <input class="form-control" placeholder="{{ __('Apellidos') }}" type="text"
+                                    name="last_name" id="registration_last_name" value="" autofocus>
                             </div>
                         </div>
                         <!-- CURP/ID -->
@@ -33,7 +37,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="ni ni-badge"></i></span>
                                 </div>
-                                <input class="form-control" placeholder="{{ __('CURP O ID') }}" type="text" name="register_id" id="registration_id" onkeyup="this.value = this.value.toUpperCase();">
+                                <input class="form-control" placeholder="{{ __('CURP O ID') }}" type="text"
+                                    name="register_id" id="registration_id"
+                                    onkeyup="this.value = this.value.toUpperCase();">
                             </div>
                         </div>
                         <!-- EMAIL -->
@@ -42,7 +48,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                                 </div>
-                                <input class="form-control" placeholder="{{ __('Correo') }}" type="email" name="email" id="registration_email" value="">
+                                <input class="form-control" placeholder="{{ __('Correo') }}" type="email" name="email"
+                                    id="registration_email" value="">
                             </div>
                         </div>
                         <!-- PASSWORD -->
@@ -51,7 +58,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                                 </div>
-                                <input class="form-control" placeholder="{{ __('Contraseña') }}" type="password" name="password" id="registration_password">
+                                <input class="form-control" placeholder="{{ __('Contraseña') }}" type="password"
+                                    name="password" id="registration_password">
                             </div>
                         </div>
                         <!-- PASSWORD CONFIRMATION -->
@@ -60,38 +68,43 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                                 </div>
-                                <input class="form-control" placeholder="{{ __('Confirma contraseña') }}" type="password" name="password_confirmation" id="registration_password_confirmation">
+                                <input class="form-control" placeholder="{{ __('Confirma contraseña') }}" type="password"
+                                    name="password_confirmation" id="registration_password_confirmation">
                             </div>
                         </div>
                         <div class="text-center text-muted font-italic">
-                            <small class="text-success">{{ __('La contraseña debe de ser de al menos 8 caracteres') }}</small>
+                            <small
+                                class="text-success">{{ __('La contraseña debe de ser de al menos 8 caracteres') }}</small>
                         </div>
                         <!-- kind of subscription -->
                         <div class="form-group text-center">
                             <small class="text-muted">{{ __('Selecciona un tipo de cuenta') }}</small>
-                            <select class="form-control btn btn-primary required" id="account_type" name="register_subscription">
+                            <select class="form-control btn btn-primary required" id="account_type"
+                                name="register_subscription">
                                 <option value="2" selected>{{ __('Nutriólogo') }}</option>
                                 <option value="3">{{ __('Paciente') }}</option>
                             </select>
                         </div>
                         <!--
-                        <div class="row my-4">
-                            <div class="col-12">
-                                <div class="custom-control custom-control-alternative custom-checkbox">
-                                    <input class="custom-control-input" id="customCheckRegister" type="checkbox">
-                                    <label class="custom-control-label" for="customCheckRegister">
-                                        <span class="text-muted">{{ __('I agree with the') }} <a href="#!">{{ __('Privacy Policy') }}</a></span>
-                                    </label>
+                            <div class="row my-4">
+                                <div class="col-12">
+                                    <div class="custom-control custom-control-alternative custom-checkbox">
+                                        <input class="custom-control-input" id="customCheckRegister" type="checkbox">
+                                        <label class="custom-control-label" for="customCheckRegister">
+                                            <span class="text-muted">{{ __('I agree with the') }} <a href="#!">{{ __('Privacy Policy') }}</a></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        -->
+                            -->
                         @include('helpers.alerts')
                         <div class="text-center">
                             <div class="text-center text-muted">
-                                <small id="empty_inputs_alert" class="text-red">{{ __('Todos los campos son obligatorios, excepto CURP/ID') }}</small>
+                                <small id="empty_inputs_alert"
+                                    class="text-red">{{ __('Todos los campos son obligatorios, excepto CURP/ID') }}</small>
                             </div>
-                            <button type="submit" id="register_btn" class="btn btn-primary mt-4">{{ __('Crear cuenta') }}</button>
+                            <button type="submit" id="register_btn"
+                                class="btn btn-primary mt-4">{{ __('Crear cuenta') }}</button>
                         </div>
                     </div>
                 </div>
