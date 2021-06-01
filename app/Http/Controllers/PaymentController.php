@@ -179,7 +179,7 @@ class PaymentController extends Controller
     {
         if (Auth::user()->hasRole('nutritionist')) {
             $auth = Auth::user();
-            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
+            $user = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
                 ->where('users.id', $auth->id)
                 ->where('active', 1)->orderBy('p.id', 'desc')->first();
             $total_patients = DB::table('patients')
@@ -194,7 +194,7 @@ class PaymentController extends Controller
             } else if ($total_patients > 150 && $total_patients <= 200) {
                 $amount_to_pay = $total_patients * 19;
             }
-            if ($user->trial_version_status) {
+            if ($auth->trial_version_status) {
                 $user->expiration_date = Carbon::parse($user->created_at)->addMonths(1);
             }
 
