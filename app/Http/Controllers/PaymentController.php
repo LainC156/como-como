@@ -195,7 +195,7 @@ class PaymentController extends Controller
                 $amount_to_pay = $total_patients * 19;
             }
             if ($auth->trial_version_status) {
-                $user->expiration_date = Carbon::parse($user->created_at)->addMonths(1);
+                $user->expiration_date = Carbon::parse($auth->created_at)->addMonths(1);
             }
 
             return view('payments.index', ['user' => $user, 'role_id' => 2, 'total_patients' => $total_patients, 'amount_to_pay' => $amount_to_pay]);
