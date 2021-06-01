@@ -179,7 +179,7 @@ class PaymentController extends Controller
     {
         if (Auth::user()->hasRole('nutritionist')) {
             $auth = Auth::user();
-            $user = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
+            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
                 ->where('users.id', $auth->id)
                 ->where('active', 1)->orderBy('p.id', 'desc')->first();
             $total_patients = DB::table('patients')
@@ -195,6 +195,7 @@ class PaymentController extends Controller
                 $amount_to_pay = $total_patients * 19;
             }
             if ($auth->trial_version_status) {
+                $user = $auth;
                 $user->expiration_date = Carbon::parse($auth->created_at)->addMonths(1);
             }
 
@@ -208,8 +209,9 @@ class PaymentController extends Controller
             }
             $user_payment = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
                 ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
-            if ($user->trial_version_status) {
-                $user_payment->expiration_date = Carbon::parse($user->created_at)->addMonths(1);
+            if ($auth->trial_version_status) {
+                $user_payment = $auth;
+                $user_payment->expiration_date = Carbon::parse($auth->created_at)->addMonths(1);
             }
             $amount_to_pay = 20;
             return view('payments.index', ['user' => $user_payment, 'role_id' => 3, 'amount_to_pay' => $amount_to_pay]);
