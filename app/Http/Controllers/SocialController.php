@@ -19,13 +19,12 @@ class SocialController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('nutritionist')) {
-            $data = DB::table('users')
-                ->select(
-                    'users.id AS user_id', 'menus.id AS menu_id', 'users.name AS username', 'users.last_name', 'users.avatar', 'menus.name', 'menus.times_downloaded',
-                    'menus.description', 'menus.kind_of_menu', 'menus.created_at', 'menus.ideal', 'menus.updated_at',
-                    'patients.weight', 'patients.height', 'patients.genre', 'patients.psychical_activity',
-                    'patients.caloric_requirement', DB::raw('COUNT(social.like) as likes')
-                )
+            $data = User::select(
+                'users.id AS user_id', 'menus.id AS menu_id', 'users.name AS username', 'users.last_name', 'users.avatar', 'menus.name', 'menus.times_downloaded',
+                'menus.description', 'menus.kind_of_menu', 'menus.created_at', 'menus.ideal', 'menus.updated_at',
+                'patients.weight', 'patients.height', 'patients.genre', 'patients.psychical_activity',
+                'patients.caloric_requirement', DB::raw('COUNT(social.like) as likes')
+            )
             /* postgresql */
                 ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
             /* mysql */
@@ -46,13 +45,12 @@ class SocialController extends Controller
             if ($userData->nutritionist_id) {
                 return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Social'));
             }
-            $data = DB::table('users')
-                ->select(
-                    'users.id AS user_id', 'menus.id AS menu_id', 'users.name AS username', 'users.last_name', 'users.avatar', 'menus.name', 'menus.times_downloaded',
-                    'menus.description', 'menus.kind_of_menu', 'menus.created_at', 'menus.ideal', 'menus.updated_at',
-                    'patients.weight', 'patients.height', 'patients.genre', 'patients.psychical_activity',
-                    'patients.caloric_requirement', DB::raw('COUNT(social.like) as likes')
-                )
+            $data = User::select(
+                'users.id AS user_id', 'menus.id AS menu_id', 'users.name AS username', 'users.last_name', 'users.avatar', 'menus.name', 'menus.times_downloaded',
+                'menus.description', 'menus.kind_of_menu', 'menus.created_at', 'menus.ideal', 'menus.updated_at',
+                'patients.weight', 'patients.height', 'patients.genre', 'patients.psychical_activity',
+                'patients.caloric_requirement', DB::raw('COUNT(social.like) as likes')
+            )
             /* postgresql */
                 ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
             /* mysql */
@@ -101,8 +99,10 @@ class SocialController extends Controller
     {
         if (Auth::user()->hasRole('nutritionist')) {
             $menu = Menu::where('id', $menu_id)->first();
-            $patient = DB::table('users')
-                ->join('patients', 'patients.user_id', '=', 'users.id')
+            if(!$menu) {
+                abort(404);
+            }
+            $patient = User::join('patients', 'patients.user_id', '=', 'users.id')
                 ->join('menus', 'menus.user_id', '=', 'users.id')
                 ->where('users.id', $menu->user_id)
                 ->select('users.*', 'patients.*', 'menus.ideal')
@@ -129,14 +129,12 @@ class SocialController extends Controller
                 ->count();
 
             /* how to manage likes and comments? */
-            $activities = DB::table('users')
-            //->join('patients', 'patients.user_id', '=', 'users.id')
-                ->join('social', 'social.user_id', '=', 'users.id')
+            $activities = User::join('social', 'social.user_id', '=', 'users.id')
                 ->join('social_comments', 'social_comments.social_id', '=', 'social.id')
                 ->join('menus', 'menus.id', '=', 'social.menu_id')
                 ->where('social.owner_id', $patient->id)
                 ->where('social.menu_id', $menu_id)
-                ->select('users.name', 'users.last_name', 'users.avatar','social.created_at', 'social.updated_at', 'social_comments.comment')
+                ->select('users.name', 'users.last_name', 'users.avatar', 'social.created_at', 'social.updated_at', 'social_comments.comment')
             //->groupBy('users.name', 'social.updated_at', 'social_comments.comment')
                 ->get();
 
@@ -148,8 +146,10 @@ class SocialController extends Controller
                 return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Social'));
             }
             $menu = Menu::where('id', $menu_id)->first();
-            $patient = DB::table('users')
-                ->join('patients', 'patients.user_id', '=', 'users.id')
+            if(!$menu) {
+                abort(404);
+            }
+            $patient = User::join('patients', 'patients.user_id', '=', 'users.id')
                 ->join('menus', 'menus.user_id', '=', 'users.id')
                 ->where('users.id', $menu->user_id)
                 ->select('users.*', 'patients.*', 'menus.ideal')
@@ -183,7 +183,7 @@ class SocialController extends Controller
                 ->join('menus', 'menus.id', '=', 'social.menu_id')
                 ->where('social.owner_id', $patient->id)
                 ->where('social.menu_id', $menu_id)
-                ->select('users.name', 'users.last_name', 'users.avatar','social.created_at', 'social.updated_at', 'social_comments.comment')
+                ->select('users.name', 'users.last_name', 'users.avatar', 'social.created_at', 'social.updated_at', 'social_comments.comment')
             //->groupBy('users.name', 'social.updated_at', 'social_comments.comment')
                 ->get();
             return view('social.show', ['patient' => $patient, 'menu' => $menu, 'like_validation' => $like_validation, 'activities' => $activities, 'like_count' => $like_count, 'comment_count' => $comment_count, 'role_id' => 3]);
@@ -356,7 +356,7 @@ class SocialController extends Controller
                         ->insert([
                             'social_id' => $id,
                             'comment' => $comment,
-                            'created_at' => Carbon::now()
+                            'created_at' => Carbon::now(),
                         ]);
                     $msg = ['status' => 'success', 'message' => __('Has comentado este menú'), 'user_name' => $user->name, 'last_name' => $user->last_name, 'avatar' => $user->avatar, 'date' => Carbon::now(), 'comment' => $comment, 'kind_of_comment' => 'new'];
                 } else {

@@ -1,5 +1,7 @@
 @extends('layouts.app', ['title' => __('User Management')])
-
+@section('title')
+    {{ __('Detalles del menú') }} | {{ __('¿Cómo como?') }}
+@endsection
 @section('content')
     @include('users.partials.header', ['title' => __('Detalles del menú')])
     <div class="container-fluid mt--7">
@@ -25,12 +27,15 @@
                         <div class="row align-items-center">
                             <div class="col-auto col-md-4">
                                 <h5 class="mb-0">{{ __('Paciente') }}:
-                                    <b class="text-primary text-uppercase">{!! $patient->name !!}
+                                    <b class="text-primary">{!! $patient->name !!}
                                         {!! $patient->last_name !!}</b>
                                 </h5>
                                 <h5 class="mb-0">{{ __('Requerimiento calórico') }}:
-                                    <b class="text-primary text-uppercase"> {!! $patient->caloric_requirement !!}
+                                    <b class="text-primary"> {!! $patient->caloric_requirement !!}
                                         {{ __('calorías') }}</b>
+                                </h5>
+                                <h5 class="mb-0">{{ __('Última actualización') }}:
+                                    <b class="text-primary">{!! $menu->updated_at !!}</b>
                                 </h5>
                             </div>
                             <div class="col-auto col-md-4">
@@ -41,6 +46,7 @@
                                     <h5 class="mb-0">{{ __('Descripción') }}:
                                         <b class="text-primary text-uppercase">{!! $menu->description !!}</b>
                                     </h5>
+                                    
                                 @else
                                     <h5 class="mb-0 text-uppercase text-primary">{{ __('Menú nuevo') }}
                                     </h5>
@@ -66,7 +72,7 @@
                                     @else
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
-                                            {{ __('Guardar una copia del menú') }}NMV: {!! $patient->nutritionist_id !!}</a>
+                                            {{ __('Guardar una copia del menú') }}</a>
                                     @endif
                                 @elseif($role_id === 3)
                                     @if ($menu_validation == 1)
@@ -76,7 +82,7 @@
                                             {{ __('Editar menú') }}</a>
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
-                                            {{ __('Guardar una copia del menú') }} MV</a>
+                                            {{ __('Guardar una copia del menú') }}</a>
                                     @elseif($patient->id !== auth()->id())
                                         <a data-toggle="modal" data-target="#saveMenuModal"
                                             class="btn btn-sm btn-success"><i class="ni ni-folder-17"></i>
@@ -144,30 +150,31 @@
                 </div>
             </div>
         </div>
-
         <!-- save menu modal -->
         <div class="modal fade" id="saveMenuModal" tabindex="-1" role="dialog" aria-labelledby="saveMenuModal"
             aria-hidden="true">
             <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                     <div class="modal-header alert-success">
-                        <h3 class="modal-title mb-0" id="exampleModalLabel">{{ __('Guardar menú') }}</h3>
+                        <h3 class="modal-title mb-0" id="exampleModalLabel">{{ __('Guardar menú de') }}</h3>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <h5 class="text-center text-primary">{{ __('Propietario') }}: {!! $patient->name !!}
-                                {!! $patient->last_name !!}</h5>
+                            <h5 class="text-center">{{ __('Propietario') }}: <b
+                                    class="text-primary">{!! $patient->name !!}
+                                    {!! $patient->last_name !!}</b></h5>
                             <h5 class="text-muted">
                                 {{ __('Este menú pertenece a otro usuario, para poder usarlo, primero debes guardarlo') }}.
                             </h5>
-                            <h6 class="text-red text-muted">{{ __('Todos los campos son requeridos') }}</h6>
+                            <span class="text-muted text-red">{{ __('Campos requeridos') }} *</span>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label class="form-control-label" for="save_menu_name">{{ __('Nombre') }}
+                                    <span class="text-red">*</span>
                                 </label>
                                 <div class="input-group input-group-alternative">
                                     <div class="input-group-prepend">
@@ -181,6 +188,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label class="form-control-label" for="save_menu_description">{{ __('Descripción') }}
+                                    <span class="text-red">*</span>
                                 </label>
                                 <div class="input-group input-group-alternative">
                                     <div class="input-group-prepend">
@@ -196,22 +204,23 @@
                                 <div class="form-group">
                                     <label class="form-control-label"
                                         for="">{{ __('Selecciona el usuario a quien asignar el menú actual') }}
-                                        <select id="patient_select" class="form-control">
-                                            <option disabled selected>{{ __('Selecciona un paciente') }}</option>
-                                            @forelse ($patients as $p)
-                                                <option value="{!! $p->id !!}">{{ $p->name }}
-                                                    {{ $p->last_name }} ({{ $p->email }})</option>
-                                            @empty
-                                                <option disabled>{{ __('Sin opciones disponibles') }}</option>
-                                            @endforelse
-                                        </select>
+                                        <span class="text-red">*</span> </label>
+                                    <select id="patient_select" class="form-control">
+                                        <option value="-1" disabled selected>{{ __('Selecciona un paciente') }}</option>
+                                        @forelse ($patients as $p)
+                                            <option value="{!! $p->id !!}">{{ $p->name }}
+                                                {{ $p->last_name }} ({{ $p->email }})</option>
+                                        @empty
+                                            <option disabled>{{ __('Sin opciones disponibles') }}</option>
+                                        @endforelse
+                                    </select>
                                 </div>
                             </div>
                         @endif
                         <div id="alert_section" class="alert alert-warning" style="display:none;" class="col">
                         </div>
                         <div class="col text-center">
-                            <button id="save_menu_btn" class="btn btn-success" disabled><i class="ni ni-folder-17"></i>
+                            <button id="save_menu_btn" class="btn btn-success"><i class="ni ni-folder-17"></i>
                                 {{ __('Guardar') }}</button>
                         </div>
                     </div>

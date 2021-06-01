@@ -1,5 +1,7 @@
 @extends('layouts.app', ['title' => __('User Management')])
-
+@section('title')
+    {{ __('Social') }} | {{ __('¿Cómo como?') }}
+@endsection
 @section('content')
     @include('users.partials.header', ['title' => __('Actividad de usuarios')])
     <div class="container-fluid mt--7">
@@ -33,150 +35,142 @@
                                 <div class="card-columns">
                                     @forelse( $activities as $a)
                                         <div class="card border-primary">
-                                            <div class="card-header bg-dark">
-                                                <div class="row">
-                                                    <div class="col-3">
+                                            <div class="card-body bg-dark">
+                                                <div class="row m-0 p-0">
+                                                    <div class="col-auto m-0 p-0">
                                                         <span class="avatar avatar rounded-circle">
                                                             <img alt="Image placeholder"
                                                                 src="{{ asset('img/avatar/' . $a->avatar) }}">
                                                         </span>
                                                     </div>
-                                                    <div class="col-9">
-                                                        <h3 class="card-title text-primary">{!! $a->username !!}
-                                                            {{ $a->last_name }}</h3>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-12 text-left">
+                                                    <div class="col text-right">
+                                                        <h5 class="text-primary">{!! $a->username !!}
+                                                            {{ $a->last_name }}</h5>
                                                         <h6 class="text-muted">{{ __('Creado') }}:
-                                                            {{ date('j-m-Y h:i:s A', strtotime($a->created_at)) }}.</h6>
+                                                            {!! date_format($a->created_at, 'd-m-Y') !!}.</h6>
                                                         <h6 class="text-muted">{{ __('Actualizado') }}:
-                                                            {{ date('j-m-Y h:i:s A', strtotime($a->updated_at)) }}.</h6>
+                                                            {!! date_format($a->updated_at, 'd-m-Y') !!}.</h6>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="card-body">
                                                 <div class="row">
                                                     @if ($a->age)
-                                                        <div class="col-auto col-12 col-sm-6">
-                                                            <span class="description text-muted">{{ __('Edad') }}:
-                                                                <strong class="text-primary">{!! $a->age !!}
-                                                                    {{ __('años') }}</strong></span>
+                                                        <div class="col-auto">
+                                                            <h5 class="text-muted">{{ __('Edad') }}:
+                                                                <b class="text-primary">{!! $a->age !!}
+                                                                    {{ __('años') }}</b>
+                                                            </h5>
                                                         </div>
                                                     @endif
                                                     @if ($a->weight)
-                                                        <div class="col-auto col-12 col-sm-6">
-                                                            <span class="description text-muted">{{ __('Peso') }}:
-                                                                <strong class="text-primary">{!! $a->weight !!}
-                                                                    {{ __('kg') }}.</strong></span>
+                                                        <div class="col-auto">
+                                                            <h5 class="text-muted">{{ __('Peso') }}:
+                                                                <b class="text-primary">{!! $a->weight !!}
+                                                                    {{ __('kg') }}.</b>
+                                                            </h5>
                                                         </div>
                                                     @endif
                                                     @if ($a->genre === '0' || $a->genre === '1')
-                                                        <div class="col-auto col-12 col-sm-6">
-                                                            <span class="description text-muted">{{ __('Género') }}:
+                                                        <div class="col-auto">
+                                                            <h5 class="text-muted">{{ __('Género') }}:
                                                                 @if ($a->genre == 0)
-                                                                    <strong
-                                                                        class="text-primary">{{ __('Hombre') }}</strong>
+                                                                    <b class="text-primary">{{ __('Hombre') }}</b>
                                                                 @elseif($a->genre == 1)
-                                                                    <strong
-                                                                        class="text-primary">{{ __('Mujer') }}</strong>
+                                                                    <b class="text-primary">{{ __('Mujer') }}</b>
                                                                 @endif
-                                                            </span>
+                                                            </h5>
                                                         </div>
                                                     @endif
                                                     @if ($a->height)
-                                                        <div class="col-auto col-12 col-sm-6">
-                                                            <span class="description text-muted">{{ __('Estatura') }}:
-                                                                <strong class="text-primary">{!! $a->height !!}
-                                                                    {{ __('cm') }}.</strong></span>
+                                                        <div class="col-auto">
+                                                            <h5 class="text-muted">{{ __('Estatura') }}:
+                                                                <b class="text-primary">{!! $a->height !!}
+                                                                    {{ __('cm') }}.</b>
+                                                            </h5>
                                                         </div>
                                                     @endif
-                                                    <div class="col-auto col-12 col-sm-6">
-                                                        <span
-                                                            class="description text-muted">{{ __('Requerimiento calórico') }}:
-                                                            <strong class="text-primary">{!! $a->caloric_requirement !!}
-                                                                {{ __('kcal') }}.</strong></span>
+                                                    <div class="col-auto">
+                                                        <h5 class="text-muted">{{ __('Requerimiento calórico') }}:
+                                                            <b class="text-primary">{!! $a->caloric_requirement !!}
+                                                                {{ __('kcal') }}.</b>
+                                                        </h5>
                                                     </div>
-                                                    <div class="col-auto col-12 col-sm-6">
+                                                    <div class="col-auto">
                                                         @if ($a->psychical_activity == 0)
-                                                            <span
-                                                                class="description text-muted">{{ __('Actividad física') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Reposo') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Actividad física') }}:
+                                                                <b class="text-primary">{{ __('Reposo') }}</b>
+                                                            </h5>
                                                         @elseif( $a->psychical_activity == 1 )
-                                                            <span
-                                                                class="description text-muted">{{ __('Actividad física') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Ligera') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Actividad física') }}:
+                                                                <b class="text-primary">{{ __('Ligera') }}</b>
+                                                            </h5>
                                                         @elseif( $a->psychical_activity == 2 )
-                                                            <span
-                                                                class="description text-muted">{{ __('Actividad física') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Moderada') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Actividad física') }}:
+                                                                <b class="text-primary">{{ __('Moderada') }}</b>
+                                                            </h5>
                                                         @elseif( $a->psychical_activity == 3 )
-                                                            <span
-                                                                class="description text-muted">{{ __('Actividad física') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Intensa') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Actividad física') }}:
+                                                                <b class="text-primary">{{ __('Intensa') }}</b>
+                                                            </h5>
                                                         @endif
                                                     </div>
-                                                    <div class="col-auto col-sm-6">
-                                                        <span class="description text-muted">{{ __('Nombre del menú') }}:
-                                                            <strong
-                                                                class="text-primary">{!! $a->name !!}</strong></span>
+                                                    <div class="col-auto">
+                                                        <h5 class="text-muted">{{ __('Nombre') }}:
+                                                            <b class="text-primary">{!! $a->name !!}</b>
+                                                        </h5>
                                                     </div>
                                                     <div class="col-auto col-sm-6 col-12">
-                                                        <span class="description text-muted">{{ __('Descripción') }}:
-                                                            <strong
-                                                                class="text-primary">{!! $a->description !!}</strong></span>
+                                                        <h5 class="text-muted">{{ __('Descripción') }}:
+                                                            <b class="text-primary">{!! $a->description !!}</b>
+                                                        </h5>
                                                     </div>
-                                                    <div class="col-auto col-sm-6">
+                                                    <div class="col-auto">
                                                         @if ($a->kind_of_menu == 1)
-                                                            <span
-                                                                class="description text-muted">{{ __('Tipo de menú') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Menú propio') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Tipo de menú') }}:
+                                                                <b class="text-primary">{{ __('Menú propio') }}</b>
+                                                            </h5>
                                                         @elseif( $a->kind_of_menu == 2)
-                                                            <span
-                                                                class="description text-muted">{{ __('Tipo de menú') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Menú de otro usuario') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Tipo de menú') }}:
+                                                                <b
+                                                                    class="text-primary">{{ __('Menú de otro usuario') }}</b>
+                                                            </h5>
                                                         @elseif( $a->kind_of_menu == 3)
-                                                            <span
-                                                                class="description text-muted">{{ __('Tipo de menú') }}:
-                                                                <strong
-                                                                    class="text-primary">{{ __('Menú editado de otro usuario') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Tipo de menú') }}:
+                                                                <b
+                                                                    class="text-primary">{{ __('Menú editado de otro usuario') }}</b>
+                                                            </h5>
                                                         @endif
                                                     </div>
-                                                    <div class="col-auto col-sm-6">
+                                                    <div class="col-auto">
                                                         @if ($a->ideal == 0)
-                                                            <span class="description text-muted">{{ __('Estado') }}:
-                                                                <strong
-                                                                    class="text-danger">{{ __('Menú desequilibrado') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Estado') }}:
+                                                                <b
+                                                                    class="text-danger">{{ __('Menú desequilibrado') }}</b>
+                                                            </h5>
                                                         @else
-                                                            <span class="description text-muted">{{ __('Estado') }}:
-                                                                <strong
-                                                                    class="text-success">{{ __('Menú equilibrado') }}</strong></span>
+                                                            <h5 class="text-muted">{{ __('Estado') }}:
+                                                                <b class="text-success">{{ __('Menú equilibrado') }}</b>
+                                                            </h5>
                                                         @endif
-                                                    </div>
-                                                    <div class="col-auto center">
-                                                        <a mr-2 class="btn btn-primary btn-sm"
-                                                            href="{{ route('social.show', [$a->menu_id]) }}"
-                                                            target="_blank"><i class="fas fa-eye fa-2x">
-                                                                {{ __('Detalles') }}</i></a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="card-footer">
                                                 <div class="row">
                                                     <div class="col-6">
-                                                        <p class="description text-red"><i
-                                                                class="fas fa-heart "></i>{!! $a->likes !!}
-                                                            {{ __('Me gusta') }}</p>
+                                                        <h5 class="description text-red">
+                                                            <i class="fas fa-heart "></i> {!! $a->likes !!}
+                                                            {{ __('Me gusta') }}
+                                                        </h5>
                                                     </div>
                                                     <div class="col-6">
-                                                        <p class="description text-warning">{!! $a->times_downloaded !!}
-                                                            {{ __('Veces descargado') }}</p>
+                                                        <h5 class="description text-warning">{!! $a->times_downloaded !!}
+                                                            {{ __('Veces descargado') }}</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col center">
+                                                        <a class="btn btn-primary btn-block btn-sm"
+                                                            href="{{ route('social.show', [$a->menu_id]) }}"
+                                                            target="_blank"><i class="fas fa-eye">
+                                                            </i> {{ __('Detalles') }}</a>
                                                     </div>
                                                 </div>
                                             </div>

@@ -60,7 +60,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('emptymenu', 'MenuController@empty')->name('empty.menu');
     Route::get('/menu/{id}/results', 'MenuController@results')->name('menu.results');
     Route::get('/search', 'MenuController@search')->name('menu.search')->middleware('payment');
-    Route::post('/searchresults', 'MenuController@searchResults')->name('menu.searchresults');
+    Route::get('/searchresults', 'MenuController@searchResults')->name('menu.searchresults');
         /* foods routes */
     Route::post('/addfood', 'FoodController@addFood')->name('food.add');
     Route::get('listfood', 'FoodController@foodList')->name('food.list');

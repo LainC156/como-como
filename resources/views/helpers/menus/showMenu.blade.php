@@ -1,5 +1,6 @@
 <!-- delete menu modal -->
-<div class="modal fade" id="showMenuModal" tabindex="-1" role="dialog" aria-labelledby="deleteMenuModal" aria-hidden="true">
+<div class="modal fade" id="showMenuModal" tabindex="-1" role="dialog" aria-labelledby="deleteMenuModal"
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header  alert alert-info">
@@ -9,10 +10,16 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="text-muted">{{ __('Nombre') }}: <span class="text-primary" id="menu_name_show"></span></p>
-                <p class="text-muted">{{ __('Descripción') }}: <span class="text-primary" id="menu_description_show"></span></p>
-                <div class="col text-center">
-                    <button id="show_menu_btn" class="btn btn-info"><i class="ni ni-folder-17"></i> {{ __('Ver menú') }}</button>
+                <div class="card shadow">
+                    <div class="card-body">
+                        <p class="text-muted">{{ __('Nombre') }}: <strong class="text-primary"
+                                id="menu_name_show"></strong>
+                        </p>
+                        <p class="text-muted">{{ __('Descripción') }}: <strong class="text-primary"
+                                id="menu_description_show"></strong></p>
+                    </div>
+                    <button id="show_menu_btn" class="btn btn-info"><i class="ni ni-folder-17"></i>
+                        {{ __('Ver detalles del menú') }}</button>
                 </div>
             </div>
         </div>

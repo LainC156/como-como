@@ -22,7 +22,8 @@ class CheckPayment
         $user = $request->user();
         if ($user->hasRole('patient') || $user->hasRole('nutritionist')) {
             /* check if trial status is not valid */
-            if ($user->trial_version_status === true && !Carbon::parse($user->created_at)->lessThan(Carbon::now())) {
+            $expires_at = $user->created_at->addMonths(1);
+            if ($user->trial_version_status === true && Carbon::now()->greaterThan($expires_at)) {
                 try {
                     DB::beginTransaction();
                     $user->trial_version_status = 0;

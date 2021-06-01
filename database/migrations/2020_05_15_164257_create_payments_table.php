@@ -25,8 +25,8 @@ class CreatePaymentsTable extends Migration
             $table->float('amount')->default(0.0);
             $table->string('currency_unit')->default('MXN');
             $table->string('payment_method')->nullable();
-            $table->date('current_date')->default( Carbon::now() );
-            $table->date('expiration_date')->default( Carbon::now()->addMonths(1) );
+            $table->datetime('current_date')->default(Carbon::now());
+            $table->datetime('expiration_date')->default(Carbon::now()->addMonths(1));
             $table->timestamps();
         });
     }

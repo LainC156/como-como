@@ -41,7 +41,8 @@
                                 </div>
                                 @if ($errors->has('email'))
                                     <span class="invalid-feedback" style="display: block;" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
+                                        <!--<strong>{{ $errors->first('email') }}</strong>-->
+                                        <strong>{{ __('El correo o contraseña son incorrectos') }}</strong>
                                     </span>
                                 @endif
                             </div>
@@ -56,7 +57,8 @@
                                 </div>
                                 @if ($errors->has('password'))
                                     <span class="invalid-feedback" style="display: block;" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
+                                        <!-- <strong>{{ $errors->first('password') }}</strong>-->
+                                        <strong>{{ __('El correo o contraseña son incorrectos') }}</strong>
                                     </span>
                                 @endif
                             </div>

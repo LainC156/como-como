@@ -79,7 +79,6 @@ jQuery(function () {
     /* verify if password field is no empty and has at least 8 characters */
     $("#input_password").on('input', function () {
         password = this.value
-        password = this.value
         password && password.length > 7 ? $(this).removeClass('is-invalid').addClass('is-valid') : $(this).removeClass('is-valid').addClass('is-invalid')
         password && password.length > 7 ? correct_password = true : correct_password = false
         /* check if password and password_confirmation fields are equals */

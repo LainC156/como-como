@@ -2,10 +2,7 @@ jQuery(function () {
     let menu_id = $("#menu_id").val();
     let patient_id = 0;
     let owner_id = $("#owner_id").val();
-    let menu_name_validation = 0;
-    let menu_description_validation = 0;
-    let patient_select_validation = 0;
-    let role_id = $("#role_id").val();
+    const role_id = $("#role_id").val();
     let menu_name = ''
     let menu_description = ''
     console.log('role_id: ', role_id);
@@ -18,7 +15,7 @@ jQuery(function () {
     });
 
     /* show menu components in DataTables */
-    let menu_table = $("#menu_table").DataTable({
+    const menu_table = $("#menu_table").DataTable({
         "pageLength": 5,
         "lengthMenu": [5, 10, 25, 50, 75, 100],
         processing: true,
@@ -28,69 +25,69 @@ jQuery(function () {
             type: 'GET',
         },
         columns: [
-        //     {
-        //     data: 'action',
-        //     name: 'action',
-        //     searchable: false,
-        //     orderable: false,
-        // },
-        {
-            data: 'kind_of_food',
-            name: 'kind_of_food',
-            render: function (data, type, full, action) {
-                switch (full.kind_of_food) {
-                    case 0:
-                        return $("#time_0").val();
-                        break;
-                    case '1':
-                        return $("#time_1").val();
-                        break;
-                    case '2':
-                        return $("#time_2").val();
-                        break;
-                    case '3':
-                        return $("#time_3").val();
-                        break;
-                    case '4':
-                        return $("#time_4").val();
-                        break;
-                }
+            //     {
+            //     data: 'action',
+            //     name: 'action',
+            //     searchable: false,
+            //     orderable: false,
+            // },
+            {
+                data: 'kind_of_food',
+                name: 'kind_of_food',
+                render: function (data, type, full, action) {
+                    switch (full.kind_of_food) {
+                        case 0:
+                            return $("#time_0").val();
+                            break;
+                        case '1':
+                            return $("#time_1").val();
+                            break;
+                        case '2':
+                            return $("#time_2").val();
+                            break;
+                        case '3':
+                            return $("#time_3").val();
+                            break;
+                        case '4':
+                            return $("#time_4").val();
+                            break;
+                    }
+                },
+                searchable: true,
+                orderable: true,
             },
-            searchable: true,
-            orderable: true,
-        },
-        { data: 'food_weight', name: 'food_weight' },
-        { data: 'name', name: 'name' },
-        { data: 'kcal', name: 'kcal' },
-        { data: 'kj', name: 'kj' },
-        { data: 'water', name: 'water' },
-        { data: 'dietary_fiber', name: 'dietary_fiber' },
-        { data: 'carbohydrates', name: 'carbohydrates' },
-        { data: 'proteins', name: 'proteins' },
-        { data: 'total_lipids', name: 'total_lipids' },
-        { data: 'saturated_lipids', name: 'saturated_lipids' },
-        { data: 'monosaturated_lipids', name: 'monosaturated_lipids' },
-        { data: 'polysaturated_lipids', name: 'polysaturated_lipids' },
-        { data: 'cholesterol', name: 'cholesterol' },
-        { data: 'calcium', name: 'calcium' },
-        { data: 'phosphorus', name: 'phosphorus' },
-        { data: 'iron', name: 'iron' },
-        { data: 'magnesium', name: 'magnesium' },
-        { data: 'sodium', name: 'sodium' },
-        { data: 'potassium', name: 'potassium' },
-        { data: 'zinc', name: 'zinc' },
-        { data: 'vitamin_a', name: 'vitamin_a' },
-        { data: 'ascorbic_acid', name: 'ascorbic_acid' },
-        { data: 'thiamin', name: 'thiamin' },
-        { data: 'rivoflavin', name: 'rivoflavin' },
-        { data: 'niacin', name: 'niacin' },
-        { data: 'pyridoxine', name: 'pyridoxine' },
-        { data: 'folic_acid', name: 'folic_acid' },
-        { data: 'cobalamin', name: 'cobalamin' },
-        { data: 'edible_percentage', name: 'edible_percentage' },
+            { data: 'food_weight', name: 'food_weight' },
+            { data: 'name', name: 'name' },
+            { data: 'kcal', name: 'kcal' },
+            { data: 'kj', name: 'kj' },
+            { data: 'water', name: 'water' },
+            { data: 'dietary_fiber', name: 'dietary_fiber' },
+            { data: 'carbohydrates', name: 'carbohydrates' },
+            { data: 'proteins', name: 'proteins' },
+            { data: 'total_lipids', name: 'total_lipids' },
+            { data: 'saturated_lipids', name: 'saturated_lipids' },
+            { data: 'monosaturated_lipids', name: 'monosaturated_lipids' },
+            { data: 'polysaturated_lipids', name: 'polysaturated_lipids' },
+            { data: 'cholesterol', name: 'cholesterol' },
+            { data: 'calcium', name: 'calcium' },
+            { data: 'phosphorus', name: 'phosphorus' },
+            { data: 'iron', name: 'iron' },
+            { data: 'magnesium', name: 'magnesium' },
+            { data: 'sodium', name: 'sodium' },
+            { data: 'potassium', name: 'potassium' },
+            { data: 'zinc', name: 'zinc' },
+            { data: 'vitamin_a', name: 'vitamin_a' },
+            { data: 'ascorbic_acid', name: 'ascorbic_acid' },
+            { data: 'thiamin', name: 'thiamin' },
+            { data: 'rivoflavin', name: 'rivoflavin' },
+            { data: 'niacin', name: 'niacin' },
+            { data: 'pyridoxine', name: 'pyridoxine' },
+            { data: 'folic_acid', name: 'folic_acid' },
+            { data: 'cobalamin', name: 'cobalamin' },
+            { data: 'edible_percentage', name: 'edible_percentage' },
         ]
     });
-    /* getting data when row menu table is clicked */
+    /* getting data when row menu table is clicked 
     $('#menu_table tbody').on('click', 'tr', 'a', function () {
         console.log('data: ' + JSON.stringify(menu_table.row(this).data()));
         let row_data = menu_table.row(this).data();
@@ -100,64 +97,36 @@ jQuery(function () {
         $("#menuComponentFoodWeightEdited").val(row_data.food_weight);
         $("#menuComponentKindOfFoodEdited").val(row_data.kind_of_food);
         $("#editMenuComponentModal").modal('show');
-    });
+    }); */
     /* validations to save menu */
     $("#menu_name").on('input', function () {
         menu_name = this.value
-        if (!menu_name) {
-            $(this).removeClass('is-valid').addClass('is-invalid')
-            menu_name_validation = 0;
-            $("#save_menu_btn").attr('disabled', true);
-        } else {
-            $(this).removeClass('is-invalid').addClass('is-valid')
-            menu_name_validation = 1;
-            if (role_id == 2) {
-                if (menu_description_validation == 1 && patient_select_validation == 1) {
-                    $("#save_menu_btn").attr('disabled', false);
-                }
-            } else if (role_id == 3) {
-                if (menu_name_validation && menu_description_validation) {
-                    $("#save_menu_btn").attr('disabled', false);
-                }
-            }
-        }
+        !menu_name ? $(this).removeClass('is-valid').addClass('is-invalid') : $(this).removeClass('is-invalid').addClass('is-valid')
     });
     $("#menu_description").on('input', function () {
         menu_description = this.value
-        if (!menu_description) {
-            $(this).removeClass('is-valid').addClass('is-invalid')
-            menu_description_validation = 0;
-            $("#save_menu_btn").attr('disabled', true);
-        } else {
-            $(this).removeClass('is-invalid').addClass('is-valid')
-            menu_description_validation = 1;
-            if (role_id == 2) {
-                if (menu_name_validation == 1 && patient_select_validation == 1) {
-                    $("#save_menu_btn").attr('disabled', false);
-                }
-            } else if (role_id == 3) {
-                if (menu_name_validation && menu_description_validation) {
-                    $("#save_menu_btn").attr('disabled', false);
-                }
-            }
-        }
+        !menu_description ? $(this).removeClass('is-valid').addClass('is-invalid') : $(this).removeClass('is-invalid').addClass('is-valid')
     });
     /* only for nutritionist */
-    if (role_id == 2) {
-        $("#patient_select").on('input', function () {
-            patient_id = this.value
-            console.log('id: ', patient_id);
-            patient_select_validation = 1;
-            $(this).addClass('is-valid')
-            if (menu_name_validation == 1 && menu_description_validation == 1) {
-                $("#save_menu_btn").attr('disabled', false);
-            } else {
-                $("#save_menu_btn").attr('disabled', true);
-            }
-        });
-    }
+    $("#patient_select").on('input', function () {
+        patient_id = this.value
+        patient_id !== -1 ? $(this).removeClass('is-invalid').addClass('is-valid') : $(this).removeClass('is-valid').addClass('is-invalid')
+    })
     /* button to save menu in certain profile */
     $("#save_menu_btn").on('click', function () {
+        /* validate fields */
+        if (!menu_name) {
+            $("#menu_name").trigger('focus').removeClass('is-valid').addClass('is-invalid')
+            return;
+        }
+        if (!menu_description) {
+            $("#menu_description").trigger('focus').removeClass('is-valid').addClass('is-invalid')
+            return;
+        }
+        if (role_id == 2 && $("#patient_select :selected").val() == -1) {
+            $("#patient_select").trigger('focus').removeClass('is-valid').addClass('is-invalid')
+            return;
+        }
         const data = {
             menu_id,
             name: menu_name,
@@ -174,22 +143,21 @@ jQuery(function () {
             data: data,
             success: function (data) {
                 $("#saveMenuModal").modal('hide');
-                if (data.status === 'success') {
-                    console.log('success: ' + data.message);
-                    showSuccessMessage(data.message);
-                } else if (data.status === 'error') {
-                    console.log('error: ' + data.message);
-                    showErrorMessage(data.message);
-                }
+                data.status === 'success' ? showSuccessMessage(data.message) : showErrorMessage(data.message)
             },
             error: function (data) {
                 $("#saveMenuModal").modal('hide');
-                showErrorMessage(data.message);
+                showErrorMessage(data.responseJSON.message);
             }
         });
     });
+    /* reset all saveMenuModal inputs */
+    $('#saveMenuModal').on('hidden.bs.modal', function () {
+        $("#menu_name, #menu_description").val('').removeClass('is-valid, is-invalid')
+        $("#patient_select").val(-1).removeClass('is-valid, is-invalid')
+    })
 
-    /* update menu component button */
+    /* update menu component button 
     $("#update_component_btn").on('click', function () {
         let food_amount = $("#menuComponentFoodWeightEdited").val();
         let food_time_id = $("#menuComponentKindOfFoodEdited :selected").val();
@@ -214,8 +182,8 @@ jQuery(function () {
                 showErrorMessage(msg);
             }
         })
-    });
-    /* delete menu component */
+    }); */
+    /* delete menu component 
     $("#delete_component_btn").on('click', function () {
         console.log('component_id: ' + component_id);
         $.ajax({
@@ -240,5 +208,5 @@ jQuery(function () {
                 showErrorMessage(msg);
             }
         })
-    });
+    });*/
 });

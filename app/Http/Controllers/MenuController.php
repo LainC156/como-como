@@ -26,11 +26,14 @@ class MenuController extends Controller
                 ->select('id', 'name', 'description', 'kind_of_menu', 'created_at', 'updated_at')
                 ->groupBy('name', 'description', 'id')
                 ->get();
+            $first = __("Ver");
+            $second = __("Editar");
+            $third = __("Eliminar");
             return DataTables::of($menus)
-                ->addColumn('action', function ($row) {
-                    return '<button class="btn btn-info btn-sm text-center" data-toggle="modal" data-target="#showMenuModal"><i class="ni ni-folder-17"></i></button>
-                            <button class="btn btn-success btn-sm text-center" data-toggle="modal" data-target="#saveMenuModal"><i class="far fa-edit"></i></button>
-                            <button class="btn btn-warning btn-sm text-center" data-toggle="modal" data-target="#deleteMenuModal"><i class="far fa-trash-alt"></i></button>';
+                ->addColumn('action', function ($row) use ($first, $second, $third) {
+                    return '<button class="btn btn-info btn-sm text-center" data-toggle="modal" data-target="#showMenuModal"><i class="ni ni-folder-17"></i> ' . $first . '</button>
+                            <button class="btn btn-success btn-sm text-center" data-toggle="modal" data-target="#saveMenuModal"><i class="far fa-edit"></i> ' . $second . '</button>
+                            <button class="btn btn-warning btn-sm text-center" data-toggle="modal" data-target="#deleteMenuModal"><i class="far fa-trash-alt"></i> ' . $third . '</button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -57,6 +60,10 @@ class MenuController extends Controller
             $nutritionist = Auth::user();
             $menu = Menu::where('id', $menu_id)
                 ->first();
+            if (!$menu) {
+                abort(404);
+            }
+
             if (request()->ajax()) {
                 return DataTables::of($menu)
                     ->addColumn('action', function ($row) {
@@ -84,10 +91,13 @@ class MenuController extends Controller
                 return DataTables::of($menu)
                     ->addColumn('action', function ($row) {
                         return '<button class="btn btn-success btn-sm text-center" data-toggle="modal" data-target="#saveMenuModal"><i class="far fa-edit"></i></button>
-                            <button class="btn btn-warning btn-sm text-center" data-toggle="modal" data-target="#deleteMenuModal"><i class="far fa-trash-alt"></i></button>';
+                                <button class="btn btn-warning btn-sm text-center" data-toggle="modal" data-target="#deleteMenuModal"><i class="far fa-trash-alt"></i></button>';
                     })
                     ->rawColumns(['action'])
                     ->make(true);
+            }
+            if (!$menu) {
+                abort(404);
             }
             /* menu owner */
             $patient = User::where('users.id', $menu->user_id)
@@ -101,7 +111,6 @@ class MenuController extends Controller
             if ($patient_logged->nutritionist_id && $menu->user_id !== $user->id) {
                 abort(403);
             }
-
             $menu_validation = (!$patient_logged->nutritionist_id && $menu->user_id === $patient_logged->id) ? 1 : 0;
             return view('menus.show', ['patient' => $patient, 'role_id' => 3, 'menu' => $menu, 'menu_validation' => $menu_validation]);
         }
@@ -118,7 +127,11 @@ class MenuController extends Controller
             $menu = Menu::where('id', $menu_id)->first();
             $patient = User::where('users.id', $menu->user_id)
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
+                ->where('p.nutritionist_id', Auth::id())
                 ->first();
+            if (!$patient) {
+                abort(403);
+            }
             $age = Carbon::parse($patient->birthdate)->age;
             /* checking if user has all atributes required to generate results
             height, weight, age, kind of psychical activity and genre( to calculate micronutrients results)
@@ -135,23 +148,28 @@ class MenuController extends Controller
 
         } else if (Auth::user()->hasRole('patient')) {
             $auth = Auth::user();
-            $user = User::join('payments as p', 'p.user_id', '=', 'users.id')
-                ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
-            if (!$user) {
-                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Menú nuevo'));
-            }
             $menu = Menu::where('id', $menu_id)->first();
+            if (!$menu) {
+                abort(404);
+            }
             $patient = User::where('users.id', $menu->user_id)
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->first();
-            $age = Carbon::parse($patient->birthdate)->age;
+            if ($patient->nutritionist_id != null) {
+                return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Menú nuevo'));
+            }
+            if ($menu->user_id !== $auth->id) {
+                abort(403);
+            }
+
+            $patient->age = Carbon::parse($patient->birthdate)->age;
             /* checking if user has all atributes required to generate results
             height, weight, age, kind of psychical activity and genre( to calculate micronutrients results)
              */
             if ($patient->caloric_requirement) {
                 $data_validation = 1;
             } else {
-                if (!$age || $patient->weight == null || $patient->height == null || $patient->genre == null || $patient->psychical_activity == null) {
+                if (!$patient->age || $patient->weight == null || $patient->height == null || $patient->genre == null || $patient->psychical_activity == null) {
                     $data_validation = 0;
                 }
             }
@@ -167,24 +185,10 @@ class MenuController extends Controller
      */
     public function create($id)
     {
-        $patient = User::where('users.id', $id)
-            ->join('patients', 'patients.id', '=', 'users.id')
-            ->first();
-        $age = Carbon::parse($patient->birthdate)->age;
-        /* checking if user has all atributes required to generate results
-        height, weight, age, kind of psychical activity and genre( to calculate micronutrients results)
-         */
-        if ($patient->caloric_requirement) {
-            $data_validation = 1;
-        } else {
-            if (!$age || $patient->weight == null || $patient->height == null || $patient->genre == null || $patient->psychical_activity == null) {
-                $data_validation = 0;
-            }
-        }
         /* check if menu without save exists, if not, then create a new menu */
         $menu = Menu::where('kind_of_menu', 0)
             ->where('user_id', $id)
-            ->where('status', 1)
+            ->where('status', true)
             ->first();
         if ($menu == null) {
             $menu = new Menu;
@@ -193,19 +197,26 @@ class MenuController extends Controller
             $menu->save();
         }
         if (Auth::user()->hasRole('nutritionist')) {
+            $patient = User::where('users.id', $id)
+                ->join('patients', 'patients.id', '=', 'users.id')
+                ->where('patients.nutritionist_id', Auth::id())
+                ->first();
+            $age = Carbon::parse($patient->birthdate)->age;
+            /* checking if user has all atributes required to generate results
+            height, weight, age, kind of psychical activity and genre( to calculate micronutrients results)
+             */
+            $patient->caloric_requirement ? $data_validation = 1 : $data_validation = 0;
             return view('menus.create', ['patient' => $patient, 'required' => $data_validation, 'menu' => $menu, 'role_id' => 2]);
         } else if (Auth::user()->hasRole('patient')) {
-            $auth = Auth::user();
+            //$auth = Auth::user();
             /* check if patient has no nutritionist */
-            $patient = User::where('users.id', $auth->id)
+            $patient = User::where('users.id', Auth::id())
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->first();
             if ($patient->nutritionist_id) {
                 return redirect()->route('home')->with('error', __('No tienes privilegios necesarios para acceder a Menú nuevo'));
             }
-            $user = User::leftJoin('payments as p', 'p.user_id', '=', 'users.id')
-                ->where('users.id', $auth->id)->orderBy('p.id', 'desc')->first();
-
+            $patient->caloric_requirement ? $data_validation = 1 : $data_validation = 0;
             return view('menus.create', ['patient' => $patient, 'required' => $data_validation, 'menu' => $menu, 'role_id' => 3]);
         }
     }
@@ -664,8 +675,8 @@ class MenuController extends Controller
             'maxCholesterol' => 300,
             'minKcal' => $patient->caloric_requirement - ($patient->caloric_requirement * 0.1),
             'maxKcal' => $patient->caloric_requirement + ($patient->caloric_requirement * 0.1),
-            'minKj'   => ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)) * 4.1868,
-            'maxKj'   => ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)) * 4.1868,
+            'minKj' => ($patient->caloric_requirement - ($patient->caloric_requirement * 0.1)) * 4.1868,
+            'maxKj' => ($patient->caloric_requirement + ($patient->caloric_requirement * 0.1)) * 4.1868,
             'role_id' => $role_id,
         ]);
     }
@@ -771,41 +782,38 @@ class MenuController extends Controller
     {
         if (Auth::user()->hasRole('nutritionist')) {
             $nutritionist = Auth::user();
-            $query = $request['search_menu'];
+            $query = strtolower($request['search_menu']);
             // split on 1+ whitespace & ignore empty (eg. trailing space)
             $search = preg_split('/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY);
-            $usernames = DB::table('users')
-                ->join('patients', 'patients.id', '=', 'users.id')
+            $usernames = User::join('patients', 'patients.id', '=', 'users.id')
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('name', 'like', "%{$s}%");
+                        //$q->orWhere('name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(users.name)'), 'like', "%{$s}%");
                     }
                 })
-            //->where('name', 'like', "%{$search}%")
                 ->orWhere(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('last_name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(users.last_name)'), 'like', "%{$s}%");
                     }
                 })
-            //->orWhere('last_name', 'like', "%{$search}%")
                 ->select('users.*', 'patients.*')
             /* postgresql */
                 ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
             /* mysql
             //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")*/
-                ->get();
-            $patients = DB::table('users')
-                ->join('patients', 'patients.user_id', '=', 'users.id')
+                ->paginate(6);
+            $patients = User::join('patients', 'patients.user_id', '=', 'users.id')
                 ->where('patients.nutritionist_id', $nutritionist->id)
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(users.last_name)'), 'like', "%{$s}%");
                     }
                 })
             //->where('name', 'like', "%{$search}%")
                 ->orWhere(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('last_name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(users.last_name)'), 'like', "%{$s}%");
                     }
                 })
             //->orWhere('last_name', 'like', "%{$search}%")
@@ -814,15 +822,14 @@ class MenuController extends Controller
                 ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
             /* mysql */
             //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")
-                ->get();
-            $foods = DB::table('menus')
-                ->join('users', 'users.id', '=', 'menus.user_id')
+                ->paginate(6);
+            $foods = User::join('menus', 'menus.user_id', '=', 'users.id')
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->join('components', 'components.menu_id', '=', 'menus.id')
                 ->join('foods', 'foods.id', '=', 'components.food_id')
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('foods.name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(foods.name)'), 'like', "%{$s}%");
                     }
                 })
             //->where('foods.name', 'like', '%'.$search.'%' )
@@ -838,9 +845,8 @@ class MenuController extends Controller
             /* mysql */
             //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")
                 ->distinct()
-                ->get();
-            $menusByName = DB::table('menus')
-                ->join('users', 'users.id', '=', 'menus.user_id')
+                ->paginate(6);
+            $menusByName = Menu::join('users', 'users.id', '=', 'menus.user_id')
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->select(
                     'menus.id as menu_id', 'menus.name AS menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
@@ -856,17 +862,16 @@ class MenuController extends Controller
             //->where('menus.kind_of_menu', 2)
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('menus.name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(menus.name)'), 'like', "%{$s}%");
                     }
                 })
             //->where('menus.name', 'like', '%'.$search.'%' )
-                ->get();
-            $menusByDescription = DB::table('menus')
-                ->where('menus.status', 1)
+                ->paginate(6);
+            $menusByDescription = Menu::where('menus.status', 1)
                 ->where('menus.kind_of_menu', '<>', 0)
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('menus.description', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(menus.description)'), 'like', "%{$s}%");
                     }
                 })
             //->where('menus.description', 'like', '%'.$search.'%' )
@@ -881,24 +886,23 @@ class MenuController extends Controller
                 ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
             /* mysql */
             //->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")
-                ->get();
+                ->paginate(6);
             return view('menus.search', ['search' => $query, 'usernames' => $usernames, 'patients' => $patients, 'foods' => $foods, 'menusByName' => $menusByName, 'menusByDescription' => $menusByDescription, 'role_id' => 2]);
         } else if (Auth::user()->hasRole('patient')) {
-            $query = $request['search_menu'];
+            $query = strtolower($request['search_menu']);
             // split on 1+ whitespace & ignore empty (eg. trailing space)
             $search = preg_split('/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY);
             //dd($search);
-            $usernames = DB::table('users')
-                ->join('patients', 'patients.id', '=', 'users.id')
+            $usernames = User::join('patients', 'patients.id', '=', 'users.id')
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(users.name)'), 'like', "%{$s}%");
                     }
                 })
             //->where('name', 'like', "%{$search}%")
                 ->orWhere(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('last_name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(users.last_name)'), 'like', "%{$s}%");
                     }
                 })
             //->orWhere('last_name', 'like', "%{$search}%")
@@ -907,15 +911,14 @@ class MenuController extends Controller
                 ->selectRaw("EXTRACT(year FROM age(patients.birthdate) ) AS age")
             /* mysql
             ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(patients.birthdate), current_date) AS age")*/
-                ->get();
-            $foods = DB::table('menus')
-                ->join('users', 'users.id', '=', 'menus.user_id')
+                ->paginate(6);
+            $foods = User::join('menus', 'menus.user_id', '=', 'users.id')
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->join('components', 'components.menu_id', '=', 'menus.id')
                 ->join('foods', 'foods.id', '=', 'components.food_id')
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('foods.name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(foods.name)'), 'like', "%{$s}%");
                     }
                 })
             //->where('foods.name', 'like', '%'.$search.'%' )
@@ -931,9 +934,8 @@ class MenuController extends Controller
             /* mysql
             ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")*/
                 ->distinct()
-                ->get();
-            $menusByName = DB::table('menus')
-                ->join('users', 'users.id', '=', 'menus.user_id')
+                ->paginate(6);
+            $menusByName = User::join('menus', 'menus.user_id', '=', 'users.id')
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->select(
                     'menus.id as menu_id', 'menus.name AS menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
@@ -949,21 +951,20 @@ class MenuController extends Controller
             //->where('menus.kind_of_menu', 2)
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('menus.name', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(menus.name)'), 'like', "%{$s}%");
                     }
                 })
             //->where('menus.name', 'like', '%'.$search.'%' )
-                ->get();
-            $menusByDescription = DB::table('menus')
-                ->where('menus.status', 1)
+                ->paginate(6);
+            $menusByDescription = User::where('menus.status', 1)
                 ->where('menus.kind_of_menu', '<>', 0)
                 ->where(function ($q) use ($search) {
                     foreach ($search as $s) {
-                        $q->orWhere('menus.description', 'like', "%{$s}%");
+                        $q->orWhere(DB::raw('lower(menus.description)'), 'like', "%{$s}%");
                     }
                 })
             //->where('menus.description', 'like', '%'.$search.'%' )
-                ->join('users', 'users.id', '=', 'menus.user_id')
+                ->join('menus', 'menus.user_id', '=', 'users.id')
                 ->join('patients as p', 'p.user_id', '=', 'users.id')
                 ->select(
                     'menus.id as menu_id', 'menus.name as menu_name', 'menus.description', 'users.name', 'users.last_name', 'users.avatar', 'menus.id AS menu_id', 'users.id AS user_id',
@@ -974,7 +975,7 @@ class MenuController extends Controller
                 ->selectRaw("EXTRACT(year FROM age(p.birthdate) ) AS age")
             /* mysql
             ->selectRaw("TIMESTAMPDIFF(YEAR, DATE(p.birthdate), current_date) AS age")*/
-                ->get();
+                ->paginate(6);
             return view('menus.search', ['search' => $query, 'usernames' => $usernames, 'foods' => $foods, 'menusByName' => $menusByName, 'menusByDescription' => $menusByDescription, 'role_id' => 3]);
         }
     }

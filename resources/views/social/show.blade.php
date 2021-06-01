@@ -1,5 +1,7 @@
 @extends('layouts.app', ['title' => __('User Management')])
-
+@section('title')
+    {{ __('Me gusta y comentarios') }} | {{ __('¿Cómo como?') }}
+@endsection
 @section('content')
     @include('users.partials.header', ['title' => __('Me gusta y comentarios')])
     <div class="container-fluid mt--7">
@@ -33,23 +35,24 @@
                         <div class="row">
                             <div class="col">
                                 <div class="card bg-dark border-primary">
-                                    <div class="card-header bg-dark" data-toggle="tooltip" data-placement="top"
+                                    <div class="card-header bg-dark pb-0" data-toggle="tooltip" data-placement="top"
                                         title="{{ __('Da clic sobre esta área para acceder al menú') }}">
                                         <a href="{{ route('menu.show', ['id' => $menu->id]) }}" target="_blank">
                                             <div class="row">
-                                                <div class="col-6">
-                                                    <h3 class="text-primary text-left">
-                                                        <span class="avatar avatar rounded-circle">
-                                                            <img alt="Image placeholder"
-                                                                src="{{ asset('img/avatar/' . $patient->avatar) }}">
-                                                        </span>{!! $patient->name !!} {{ $patient->last_name }}
-                                                    </h3>
+                                                <div class="col-auto">
+                                                    <span class="avatar avatar rounded-circle">
+                                                        <img alt="Image placeholder"
+                                                            src="{{ asset('img/avatar/' . $patient->avatar) }}">
+                                                    </span>
                                                 </div>
-                                                <div class="col-6 col-sm-6">
-                                                    <p class="h5 text-right text-muted">{{ __('Creado') }}:
-                                                        {!! date('d-M-y\\, h:i:s A', strtotime($menu->created_at)) !!}. </p>
-                                                    <p class="h5 text-muted text-right">{{ __('Actualizado') }}:
-                                                        {!! date('d-M-y\\, h:i:s A', strtotime($menu->updated_at)) !!}.</p>
+                                                <div class="col">
+                                                    <p class="h3 text-primary">{!! $patient->fullname !!}</p>
+                                                </div>
+                                                <div class="col text-right">
+                                                    <p class="h5 text-muted">{{ __('Creado') }}:
+                                                        {!! date('d-m-y', strtotime($menu->created_at)) !!} </p>
+                                                    <p class="h5 text-muted">{{ __('Actualizado') }}:
+                                                        {!! date('d-m-y', strtotime($menu->updated_at)) !!}</p>
                                                 </div>
                                             </div>
                                         </a>
@@ -171,6 +174,12 @@
                                                                     {{ __('Comentarios') }}
                                                                 </div>
                                                             </div>
+                                                            <div class="col">
+                                                                <a class="btn btn-primary"
+                                                                    href="{{ route('menu.show', ['id' => $menu->id]) }}"
+                                                                    target="_blank"><i class="fas fa-eye"></i>
+                                                                    {{ __('Ver menú') }}</a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="card-body">
@@ -191,7 +200,7 @@
                                                         <div class="row">
                                                             <div class="col" id="social_comments">
                                                                 @forelse ($activities as $activity)
-                                                                    <div class="card bg-light">
+                                                                    <div class="card bg-light m-0 p-0">
                                                                         <div class="card-body">
                                                                             <div class="row">
                                                                                 <div class="col-auto">
@@ -203,9 +212,8 @@
                                                                                 </div>
                                                                                 <div class="col-auto">
                                                                                     <div class="col">
-                                                                                        <strong class="text-success">@
-                                                                                            {!! $activity->name !!}
-                                                                                            {!! $activity->last_name !!}</strong>
+                                                                                        <b class="text-success">@
+                                                                                            {!! $activity->fullname !!}</b>
                                                                                     </div>
                                                                                     <div class="col-auto">
                                                                                         <span class="text-muted pull-right">
@@ -374,6 +382,7 @@
                     let av = data.avatar;
                     console.log('avatar:', av);
                     let date = data.date;
+                    console.log('date: ', date)
                     let comment = data.comment;
                     $("#input_comment").val('');
                     if (data.kind_of_comment == 'new' || data.kind_of_comment ==

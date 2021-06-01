@@ -173,7 +173,7 @@ class UserController extends Controller
             $wrist_size = $request['wrist_size'];
             $automatic_calculation = $request['automatic_calculation'];
             $caloric_requirement = $request['caloric_requirement'];
-            //dd($weight, $height, $birthdate, $genre, $psychical_activity);
+            //dd($caloric_requirement);
             /* validate changes in password */
             if ($automatic_calculation === "true") {
                 $caloric_requirement = $this->getCaloricRequirement($weight, $height, $birthdate, $genre, $psychical_activity);

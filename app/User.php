@@ -2,9 +2,7 @@
 
 namespace App;
 
-use App\Patient;
 use App\Role;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Rennokki\QueryCache\Traits\QueryCacheable;
@@ -23,7 +21,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name', 'last_name', 'identificator', 'email', 'password', 'email_verified_at', 'account_type',
-        'subscription_status', 'trial_version_status', 'created_at', 'updated_at', 'avatar'
+        'subscription_status', 'trial_version_status', 'created_at', 'updated_at', 'avatar',
     ];
 
     /**
@@ -43,12 +41,30 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
+    protected $dates = [
+        'created_at' => 'datetime:d-mY'
+    ];
+    /**
+     * get full name
+     *
+     */
+    protected function getFullNameAttribute()
+    {
+        return $this->name . ' ' . $this->last_name;
+    }
+    /**
+     * get formatted dates
+     * 
+     */
+    protected function setCreatedAtAttribute($value) {
+        $this->attributes['created_at'] = (new Carbon($value))->format('d-m-Y');
+    }
     /**
      * Relation with Role model
      *
      */
-    public function roles() {
+    public function roles()
+    {
         return $this->belongsToMany(Role::class)->withTimestamps();
     }
 
@@ -56,12 +72,14 @@ class User extends Authenticatable
      * Methods between User and Role models
      *
      */
-    public function authorizeRoles($roles) {
+    public function authorizeRoles($roles)
+    {
         abort_unless($this->hasAnyRole($roles), 401);
         return true;
     }
 
-    public function hasAnyRole($roles) {
+    public function hasAnyRole($roles)
+    {
         if (is_array($roles)) {
             foreach ($roles as $role) {
                 if ($this->hasRole($role)) {
@@ -75,7 +93,8 @@ class User extends Authenticatable
         }
         return false;
     }
-    public function hasRole($role) {
+    public function hasRole($role)
+    {
         if ($this->roles()->where('name', $role)->first()) {
             return true;
         }
