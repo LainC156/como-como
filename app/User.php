@@ -53,13 +53,6 @@ class User extends Authenticatable
         return $this->name . ' ' . $this->last_name;
     }
     /**
-     * get formatted dates
-     * 
-     */
-    protected function setCreatedAtAttribute($value) {
-        $this->attributes['created_at'] = (new Carbon($value))->format('d-m-Y');
-    }
-    /**
      * Relation with Role model
      *
      */
